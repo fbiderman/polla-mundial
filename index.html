@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polla Mundial 2026 · La Copa de los Amigos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e8ebf0;
+    --bg:#eef1f6; --panel:#ffffff;
+    --green:#16a34a; --green2:#22c55e; --blue:#3b82f6; --gold:#eab308; --silver:#94a3b8; --bronze:#c2752b;
+    --shadow:0 6px 24px rgba(15,23,42,.07); --shadow2:0 2px 8px rgba(15,23,42,.06);
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.disp{font-family:'Outfit','Inter',sans-serif}
+
+  header{position:relative;overflow:hidden;background:radial-gradient(1200px 300px at 80% -40%,rgba(34,197,94,.25),transparent),linear-gradient(120deg,#06281d 0%,#0a1018 60%,#0a1018 100%);color:#fff;padding:22px 26px}
+  header::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 2px,transparent 2px 64px);pointer-events:none}
+  header .wrap{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
+  header h1{font-size:22px;margin:0;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+  header .ball{display:inline-block;animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  header .sub{color:#9fb3ab;font-size:12.5px;margin-top:3px}
+  header .live{display:flex;gap:10px}
+  .lv{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px 14px;min-width:96px;text-align:center;backdrop-filter:blur(4px)}
+  .lv .l{font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:#9fb3ab}
+  .lv .v{font-size:17px;font-weight:800;font-family:'Outfit';margin-top:2px;display:flex;gap:6px;align-items:center;justify-content:center}
+
+  nav{position:sticky;top:0;z-index:40;background:rgba(10,16,24,.92);backdrop-filter:blur(8px);display:flex;gap:4px;padding:0 16px;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.06)}
+  nav .wrap{max-width:1140px;margin:0 auto;display:flex;gap:2px;width:100%}
+  nav button{position:relative;background:none;border:none;color:#93a3b5;padding:14px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:color .2s}
+  nav button:hover{color:#e2e8f0}
+  nav button.active{color:#fff}
+  nav button.active::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;background:linear-gradient(90deg,var(--green2),var(--gold));border-radius:3px 3px 0 0}
+
+  main{max-width:1140px;margin:0 auto;padding:22px 16px 70px}
+  section{animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .card h2{font-size:16px;margin:0 0 4px;font-weight:700}
+  .card .desc{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:680px){.kpi{grid-template-columns:repeat(2,1fr)}}
+  .k{background:linear-gradient(180deg,#fff,#fbfcfe);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow2)}
+  .k .v{font-size:26px;font-weight:800;font-family:'Outfit';line-height:1.1;display:flex;align-items:center;gap:8px}
+  .k .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+  .num{text-align:center}.right{text-align:right}
+
+  .rk-row{cursor:pointer;transition:background .15s}
+  .rk-row:hover{background:#f7faf8}
+  .pos{width:46px;text-align:center;font-weight:800;font-family:'Outfit';color:var(--muted)}
+  .medal{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+  .m1{background:linear-gradient(135deg,#fde047,#eab308)} .m2{background:linear-gradient(135deg,#e2e8f0,#94a3b8)} .m3{background:linear-gradient(135deg,#fbbf6e,#c2752b)}
+  .pname{font-weight:600;font-size:14.5px}
+  .ptot{font-weight:800;font-family:'Outfit';font-size:18px}
+  .bar{height:9px;background:#eef0f3;border-radius:6px;overflow:hidden;min-width:90px}
+  .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:6px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+  .delta{font-size:11px;color:var(--muted)}
+
+  .btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .12s,box-shadow .2s;box-shadow:0 2px 8px rgba(22,163,74,.25)}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(22,163,74,.32)}
+  .btn:active{transform:translateY(0)}
+  .btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow2)}
+  .btn.warn{background:#fff;color:#b45309;border:1px solid #f0d9b5;box-shadow:none}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  .seg{display:inline-flex;background:#eef1f6;border-radius:12px;padding:4px;gap:3px;flex-wrap:wrap}
+  .seg button{border:none;background:none;padding:7px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:inherit;display:flex;align-items:center;gap:6px;transition:.15s}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow2)}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:4px 9px;font-size:12.5px;margin:3px 4px 3px 0}
+  .chip.ok{background:#dcfce7;color:#166534;font-weight:600}
+  .chip.no{background:#fef2f2;color:#b91c1c}
+  .flag{font-size:15px;line-height:1}
+
+  /* resultados grupos */
+  .date-h{font-weight:700;color:var(--ink2);font-size:12.5px;margin:16px 0 6px;text-transform:capitalize;display:flex;align-items:center;gap:8px}
+  .date-h::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;background:var(--green2)}
+  .mrow{display:grid;grid-template-columns:30px 26px 1fr auto 1fr;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid #f1f3f6;border-radius:8px;transition:background .15s}
+  .mrow:hover{background:#f8fafb}
+  .mrow .mn{color:var(--muted);font-size:11px;text-align:center}
+  .mrow .gp{font-weight:700;color:var(--blue);font-size:11px;text-align:center}
+  .mrow .tl{text-align:right;display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .mrow .tv{text-align:left;display:flex;align-items:center;gap:6px}
+  .sb{display:flex;align-items:center;gap:5px}
+  input[type=number]{width:42px;text-align:center;font-family:inherit;font-size:14px;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;transition:border .15s}
+  input[type=number]:focus{outline:none;border-color:var(--green2)}
+  input.filled{border-color:var(--green2);background:#f0fdf4}
+  select{font-family:inherit;font-size:13.5px;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff;cursor:pointer}
+
+  /* matriz avance real */
+  .adv td,.adv th{padding:6px 8px;text-align:center;border-bottom:1px solid #f1f3f6}
+  .adv th{font-size:10px}
+  .adv .tname{text-align:left;display:flex;align-items:center;gap:7px;font-size:12.5px}
+  .adv input[type=checkbox]{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
+
+  /* bracket */
+  .bracket{display:flex;gap:28px;overflow-x:auto;padding:8px 4px 16px;align-items:stretch}
+  .bcol{flex:0 0 168px;width:168px;display:flex;flex-direction:column}
+  .bcol .rh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:center;height:16px;margin-bottom:10px;flex:0 0 auto}
+  .bcol .ties{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+  .tie{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow2);position:relative}
+  .tie .t{display:flex;align-items:center;gap:7px;padding:7px 9px;font-size:12.5px}
+  .tie .t+.t{border-top:1px solid #f1f3f6}
+  .tie .t .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tie .t .sc{font-weight:700;color:var(--ink2);min-width:14px;text-align:center}
+  .tie .t.win{background:#f0fdf4}.tie .t.win .nm{font-weight:700}
+  .tie .t.hit{background:#dcfce7}
+  .tie .t.miss{opacity:.55}
+  .champ-box{align-self:center;text-align:center;padding:14px;border:2px dashed var(--gold);border-radius:14px;background:linear-gradient(180deg,#fffbeb,#fff)}
+  .champ-box .lab{font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:#a16207;font-weight:700}
+  .champ-box .who{font-family:'Outfit';font-weight:800;font-size:18px;margin-top:6px;display:flex;align-items:center;gap:8px;justify-content:center}
+
+  .legend{font-size:12px;color:var(--muted);line-height:1.7;margin-top:10px}
+  .pill{display:inline-block;font-size:10.5px;padding:2px 9px;border-radius:20px;font-weight:700;letter-spacing:.3px}
+  .pill.exact{background:#dcfce7;color:#166534}.pill.sign{background:#dbeafe;color:#1e40af}
+  textarea{width:100%;min-height:84px;font-family:ui-monospace,monospace;font-size:12px;border:1.5px solid var(--line);border-radius:10px;padding:10px}
+  .small{font-size:12px;color:var(--muted)}
+  .saveflash{font-size:12px;color:var(--green);opacity:0;transition:opacity .3s;font-weight:600}
+  .stagebar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .stagebar .s{flex:1;min-width:90px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .stagebar .s .lab{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .stagebar .s .val{font-family:'Outfit';font-weight:800;font-size:16px;margin-top:2px}
+  .predcell{font-size:12px;font-variant-numeric:tabular-nums}
+
+  /* banda mundial */
+  header{border-bottom:4px solid transparent;border-image:linear-gradient(90deg,#e4002b,#16a34a,#3b82f6,#eab308,#e4002b) 1}
+  #fw{position:fixed;inset:0;pointer-events:none;z-index:60;display:none}
+  .wc-band{display:flex;align-items:center;gap:16px;background:linear-gradient(110deg,#06281d,#0a1018 55%,#101826);border:1px solid var(--line);border-radius:var(--r);padding:14px 20px;margin-bottom:18px;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .wc-band::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,#e4002b,#16a34a,#3b82f6,#eab308)}
+  .wc-trophy{flex:0 0 auto;filter:drop-shadow(0 2px 6px rgba(245,197,66,.4))}
+  .wc-txt{flex:1}
+  .wc-t1{font-family:'Outfit';font-weight:800;font-size:18px;letter-spacing:.5px;background:linear-gradient(90deg,#fde047,#f5c542);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .wc-t2{font-size:12.5px;color:#cbd5e1;margin-top:3px}
+  .wc-t2 span{font-size:15px}
+  .wc-ball{font-size:30px;animation:spin 7s linear infinite}
+
+  .badge{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:middle}
+  .badge.bid{background:#e0f2fe;color:#075985}
+  .badge.bre{background:#fae8ff;color:#86198f}
+
+  /* partidos del día */
+  .day-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .day-nav #dLabel{font-family:'Outfit';font-weight:800;font-size:16px;min-width:200px;text-align:center;text-transform:capitalize}
+  table.day th,table.day td{padding:9px 10px;border-bottom:1px solid var(--line)}
+  table.day .dh-ex{background:#dcfce7;font-weight:700;border-radius:6px}
+  table.day .dh-sg{background:#dbeafe;border-radius:6px}
+  table.day .dh-no{color:#cbd5e1}
+  table.day .dpts{font-size:10px;font-weight:800;margin-top:3px;letter-spacing:.3px;color:var(--muted)}
+  table.day .dh-ex .dpts{color:#15803d}
+  table.day .dh-sg .dpts{color:#1d4ed8}
+  table.day .dh-no .dpts{color:#cbd5e1}
+
+  /* banner campeón */
+  #champBanner,#playerChampBanner{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .cwin{flex:1;min-width:200px;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:2px solid var(--gold);background:linear-gradient(120deg,#fffbeb,#fff)}
+  .cwin.bronze{border-color:var(--bronze);background:linear-gradient(120deg,#fff7ed,#fff)}
+  .cwin .cflag{font-size:40px;line-height:1}
+  .cwin .clab{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:#a16207;font-weight:800}
+  .cwin.bronze .clab{color:var(--bronze)}
+  .cwin .cname{font-family:'Outfit';font-weight:800;font-size:22px;margin-top:2px}
+  .cwin.hit{box-shadow:0 0 0 3px rgba(22,163,74,.25)}
+
+  /* instrucciones for dummies */
+  .howto .step{display:flex;gap:16px;margin-bottom:8px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line)}
+  .howto .step:first-of-type{border-top:none}
+  .howto .stepn{flex:0 0 auto;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Outfit';font-weight:800;font-size:19px;box-shadow:0 3px 8px rgba(22,163,74,.3)}
+  .howto .stepc{flex:1}
+  .howto .stepc h3{margin:6px 0 8px;font-size:16px}
+  .howto .stepc p{margin:0 0 10px;color:var(--ink2);line-height:1.65}
+  .ex{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0}
+  .exbox{flex:1;min-width:220px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fbfcfe}
+  .exbox .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .scorepill{display:inline-flex;align-items:center;gap:7px;font-family:'Outfit';font-weight:800;font-size:15px}
+  .ptbig{font-family:'Outfit';font-weight:800;font-size:22px}
+  .ptbig.g{color:var(--green)}.ptbig.b{color:var(--blue)}.ptbig.z{color:var(--silver)}
+  .exbox .cap{font-size:12px;color:var(--muted)}
+  .elim{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .elimrow{display:flex;align-items:center;gap:12px}
+  .elimrow .rlab{flex:0 0 130px;font-weight:600;font-size:13px}
+  .elimrow .rbarw{flex:1;background:#eef0f3;border-radius:8px;overflow:hidden}
+  .elimrow .rbar{height:16px;border-radius:8px;background:linear-gradient(90deg,var(--green),var(--gold))}
+  .elimrow .rpts{font-family:'Outfit';font-weight:800;min-width:54px;text-align:right;color:var(--ink)}
+  .tip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;color:#166534;line-height:1.6}
+  .navhint{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+  @media(max-width:600px){.navhint{grid-template-columns:1fr}}
+  .navhint .nh{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fbfcfe}
+  .navhint .nh b{display:block;margin-bottom:2px}
+
+  /* tabla de posiciones */
+  .standings{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .gcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:var(--shadow2)}
+  .gcard .gh{background:#0a1018;color:#fff;font-family:'Outfit';font-weight:800;font-size:13px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center}
+  .gcard .gh .pl{font-weight:500;color:#9fb3ab;font-size:11px}
+  .gtab{width:100%;border-collapse:collapse;font-size:12.5px}
+  .gtab th{font-size:9.5px;color:var(--muted);padding:6px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);text-align:center}
+  .gtab th.l{text-align:left}
+  .gtab td{padding:7px 6px;border-bottom:1px solid #f1f3f6;text-align:center}
+  .gtab tr:last-child td{border-bottom:none}
+  .gtab td.tn{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+  .gtab td.tn .flag{margin-right:6px}
+  .gtab .pos{width:30px;color:var(--muted);font-weight:700}
+  .gtab tr.q1 td,.gtab tr.q2 td{background:#f0fdf4}
+  .gtab tr.q3 td{background:#fffbeb}
+  .gtab .ptscol{font-weight:800;font-family:'Outfit'}
+  .qd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .qd.g{background:var(--green)}.qd.y{background:var(--gold)}.qd.n{background:#e2e8f0}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div>
+      <h1><span class="ball">⚽</span> POLLA MUNDIAL 2026</h1>
+      <div class="sub">La Copa de los Amigos · 8 participantes · grupos + eliminación directa</div>
+    </div>
+    <div class="live">
+      <div class="lv"><div class="l">Líder</div><div class="v" id="hLeader">—</div></div>
+      <div class="lv"><div class="l">Jugados</div><div class="v" id="hPlayed">0/72</div></div>
+      <div class="lv"><div class="l">Etapa</div><div class="v" id="hStage">Grupos</div></div>
+    </div>
+  </div>
+</header>
+<nav><div class="wrap">
+  <button class="active" data-tab="ranking">🏆 Ranking</button>
+  <button data-tab="hoy">📅 Hoy</button>
+  <button data-tab="llaves">🗺️ Llaves</button>
+  <button data-tab="resultados">📝 Resultados</button>
+  <button data-tab="detalle">🔍 Por jugador</button>
+  <button data-tab="pronos">📊 Pronósticos</button>
+  <button data-tab="datos">🔗 Compartir</button>
+  <button data-tab="howto">📖 Cómo funciona</button>
+</div></nav>
+<main>
+
+  <section id="tab-ranking">
+    <canvas id="fw"></canvas>
+    <div class="wc-band">
+      <div class="wc-trophy">
+        <svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
+          <path d="M14 6h20v6a10 10 0 0 1-20 0V6Z" fill="#f5c542"/>
+          <path d="M14 8H8v3a7 7 0 0 0 7 7v-3a4 4 0 0 1-4-4V8Zm20 0h6v3a7 7 0 0 1-7 7v-3a4 4 0 0 0 4-4V8Z" fill="#e0a900"/>
+          <rect x="21" y="21" width="6" height="8" fill="#e0a900"/>
+          <rect x="15" y="29" width="18" height="4" rx="1" fill="#c98a00"/>
+          <rect x="13" y="33" width="22" height="5" rx="1.5" fill="#b07a00"/>
+        </svg>
+      </div>
+      <div class="wc-txt">
+        <div class="wc-t1">COPA MUNDIAL 2026</div>
+        <div class="wc-t2">Canadá <span>🇨🇦</span> · México <span>🇲🇽</span> · Estados Unidos <span>🇺🇸</span></div>
+      </div>
+      <div class="wc-ball">⚽</div>
+    </div>
+    <div class="kpi" id="kpis"></div>
+    <div class="card">
+      <h2>Tabla general</h2>
+      <p class="desc">Toca a un jugador para ver su detalle. Exacto <span class="pill exact">5</span> · signo <span class="pill sign">3</span> · más puntos por acertar quién avanza en cada llave.</p>
+      <div id="finalToggleWrap" style="margin-bottom:14px"></div>
+      <table><thead><tr><th class="pos">#</th><th>Jugador</th><th class="num">Total</th><th class="num">Grupos</th><th class="num">Final</th><th style="width:150px">Avance</th></tr></thead>
+      <tbody id="rankBody"></tbody></table>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Puntos totales</h2><canvas id="chTot" height="230"></canvas></div>
+      <div class="card"><h2>Grupos vs Eliminación</h2><canvas id="chSplit" height="230"></canvas></div>
+    </div>
+  </section>
+
+  <section id="tab-hoy" style="display:none">
+    <div class="card">
+      <h2>Partidos del día</h2>
+      <p class="desc">El resultado y el pronóstico de cada participante. Verde = marcador exacto · azul = signo.</p>
+      <div class="day-nav">
+        <button class="btn sec" id="dPrev">‹</button>
+        <div id="dLabel"></div>
+        <button class="btn sec" id="dNext">›</button>
+        <button class="btn sec" id="dToday">Hoy</button>
+      </div>
+      <div id="dayWrap" style="overflow-x:auto"></div>
+    </div>
+  </section>
+
+  <section id="tab-llaves" style="display:none">
+    <div class="card">
+      <h2>Cuadro de eliminación</h2>
+      <p class="desc">Mira el cuadro real del torneo o el pronóstico de cada participante. En verde, los equipos que acertó.</p>
+      <div class="seg" id="brkSel" style="margin-bottom:14px"></div>
+      <div id="champBanner"></div>
+      <div class="bracket" id="bracketWrap"></div>
+      <div class="small" style="margin-top:6px">← desliza para ver todas las rondas →</div>
+    </div>
+  </section>
+
+  <section id="tab-resultados" style="display:none">
+    <div class="card">
+      <h2>⚡ Sincronización automática</h2>
+      <p class="desc">Trae los resultados oficiales (openfootball, público y sin clave) y rellena marcadores y clasificados por ronda.</p>
+      <div class="btnrow">
+        <label class="small" style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="autoChk"> Sincronizar cada 5 min</label>
+        <button class="btn" id="btnSync">Sincronizar ahora</button>
+        <span class="small" id="syncStatus">—</span>
+        <span class="saveflash" id="saveflash">✓ guardado</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Fase de grupos</h2>
+      <p class="desc">Escribe el marcador real. El ranking se actualiza al instante.</p>
+      <div class="seg" id="grpFilter" style="margin-bottom:8px"></div>
+      <div id="matchInputs"></div>
+    </div>
+    <div class="card">
+      <h2>Tabla de posiciones (real)</h2>
+      <p class="desc">Se calcula sola con los resultados cargados. Los 2 primeros de cada grupo (verde) clasifican; el 3° (amarillo) puede pasar como mejor tercero.</p>
+      <div id="standingsWrap" class="standings"></div>
+    </div>
+    <div class="card">
+      <h2>Avance real por ronda</h2>
+      <p class="desc">Marca qué equipos llegaron a cada etapa (se autocompleta al sincronizar). Esto define los puntos de eliminación.</p>
+      <div class="btnrow" style="margin-bottom:12px">
+        <div><div class="small">Campeón</div><select id="rCamp"></select></div>
+        <div><div class="small">Subcampeón</div><select id="rSub"></select></div>
+        <div><div class="small">Tercer lugar</div><select id="rThird"></select></div>
+      </div>
+      <div style="overflow-x:auto"><table class="adv"><thead><tr><th style="text-align:left">Equipo</th><th>Dieciseisavos</th><th>Octavos</th><th>Cuartos</th><th>Semis</th><th>Final</th></tr></thead><tbody id="advBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="tab-detalle" style="display:none">
+    <div class="card">
+      <h2>Detalle por jugador</h2>
+      <select id="playerSel" style="margin:6px 0 8px"></select>
+      <div class="stagebar" id="stageBreak"></div>
+      <h3 style="font-size:14px;margin:20px 0 6px">1 · Fase de grupos</h3>
+      <table><thead><tr><th class="num">#</th><th class="num">Gr</th><th class="right">Local</th><th class="num">Pron.</th><th class="num">Real</th><th>Visita</th><th class="num">Pts</th></tr></thead><tbody id="detBody"></tbody></table>
+      <h3 style="font-size:14px;margin:20px 0 8px">Posiciones según su pronóstico</h3>
+      <div id="playerStandings" class="standings"></div>
+      <h3 style="font-size:14px;margin:24px 0 8px">2 · Fase de eliminación <span class="small" style="font-weight:400">— puntos generados por cada llave</span></h3>
+      <div id="playerChampBanner"></div>
+      <div class="bracket" id="playerBracketGfx"></div>
+    </div>
+  </section>
+
+  <section id="tab-pronos" style="display:none">
+    <div class="card">
+      <h2>Pronósticos de grupos</h2>
+      <p class="desc">Lo que marcó cada uno en cada partido.</p>
+      <div style="overflow-x:auto"><table id="predTable"></table></div>
+    </div>
+    <div class="card">
+      <h2>Pronósticos de fase final</h2>
+      <p class="desc">Las llaves que armó cada uno, de dieciseisavos a la final. Pasa el cursor sobre una bandera para ver el país.</p>
+      <div style="overflow-x:auto"><table id="predFinal"></table></div>
+    </div>
+  </section>
+
+  <section id="tab-datos" style="display:none">
+    <div class="card">
+      <h2>Compartir en línea</h2>
+      <p class="desc">Genera un enlace que lleva los resultados dentro de la URL. Quien lo abra verá el mismo estado.</p>
+      <div class="btnrow"><button class="btn" id="btnShare">Generar enlace</button><button class="btn sec" id="btnCopy">Copiar</button></div>
+      <textarea id="shareUrl" style="margin-top:10px" placeholder="Aquí aparece el enlace..."></textarea>
+    </div>
+    <div class="card">
+      <h2>Respaldo</h2>
+      <div class="btnrow"><button class="btn sec" id="btnExport">Exportar (JSON)</button><button class="btn sec" id="btnImport">Importar</button><button class="btn warn" id="btnReset">Borrar todo</button></div>
+      <textarea id="ioBox" style="margin-top:10px" placeholder="Pega aquí un JSON exportado y presiona Importar..."></textarea>
+    </div>
+  </section>
+
+  <section id="tab-howto" style="display:none">
+    <div class="card howto">
+      <h2>📖 ¿Cómo funciona la polla? (en simple)</h2>
+      <p class="desc">Todo se calcula y actualiza solo. Acá va el resumen para que nadie quede perdido.</p>
+
+      <div class="step"><div class="stepn">1</div><div class="stepc">
+        <h3>⚽ Tu pronóstico ya está cargado</h3>
+        <p>Cada participante ya entregó su planilla: el marcador de los 72 partidos de la fase de grupos y su cuadro completo de eliminación (desde dieciseisavos hasta el campeón). No hay que volver a llenar nada.</p>
+      </div></div>
+
+      <div class="step"><div class="stepn">2</div><div class="stepc">
+        <h3>🥅 Cómo sumas en la fase de grupos</h3>
+        <p>Por cada partido comparamos tu marcador con el resultado real:</p>
+        <div class="ex">
+          <div class="exbox"><div class="top"><span class="scorepill">🇧🇷 2 - 1 🇲🇦</span><span class="ptbig g">+5</span></div><div class="cap">Le achuntaste al <b>marcador exacto</b> (pusiste 2-1 y salió 2-1).</div></div>
+          <div class="exbox"><div class="top"><span class="scorepill">🇧🇷 2 - 1 → 3 - 0</span><span class="ptbig b">+3</span></div><div class="cap">Acertaste el <b>ganador</b> aunque no el marcador (igual ganó Brasil).</div></div>
+          <div class="exbox"><div class="top"><span class="scorepill">🇧🇷 2 - 1 → 0 - 2</span><span class="ptbig z">0</span></div><div class="cap">No acertaste ni el ganador. Cero puntos.</div></div>
+        </div>
+      </div></div>
+
+      <div class="step"><div class="stepn">3</div><div class="stepc">
+        <h3>🏟️ Cómo sumas en la fase de eliminación</h3>
+        <p>Acá no importa el marcador, sino <b>acertar qué equipos llegan a cada ronda</b>. Por cada equipo que pusiste y que de verdad clasifica a esa etapa, ganas puntos. Mientras más avanzada la ronda, más valen:</p>
+        <div class="elim">
+          <div class="elimrow"><div class="rlab">Dieciseisavos</div><div class="rbarw"><div class="rbar" style="width:8%"></div></div><div class="rpts">+2</div></div>
+          <div class="elimrow"><div class="rlab">Octavos</div><div class="rbarw"><div class="rbar" style="width:16%"></div></div><div class="rpts">+4</div></div>
+          <div class="elimrow"><div class="rlab">Cuartos</div><div class="rbarw"><div class="rbar" style="width:24%"></div></div><div class="rpts">+6</div></div>
+          <div class="elimrow"><div class="rlab">Semifinales</div><div class="rbarw"><div class="rbar" style="width:36%"></div></div><div class="rpts">+9</div></div>
+          <div class="elimrow"><div class="rlab">Finalista</div><div class="rbarw"><div class="rbar" style="width:48%"></div></div><div class="rpts">+12</div></div>
+          <div class="elimrow"><div class="rlab">Tercer lugar</div><div class="rbarw"><div class="rbar" style="width:48%"></div></div><div class="rpts">+12</div></div>
+          <div class="elimrow"><div class="rlab">Subcampeón</div><div class="rbarw"><div class="rbar" style="width:60%"></div></div><div class="rpts">+15</div></div>
+          <div class="elimrow"><div class="rlab">Campeón</div><div class="rbarw"><div class="rbar" style="width:100%"></div></div><div class="rpts">+25</div></div>
+        </div>
+        <p class="cap" style="margin-top:8px">Ejemplo: si pusiste a Brasil como semifinalista y Brasil llega a semis, ganas +9. Si además le achuntaste al campeón, son +25 más.</p>
+      </div></div>
+
+      <div class="step"><div class="stepn">4</div><div class="stepc">
+        <h3>🔄 Los resultados entran solos</h3>
+        <p>El tablero se conecta a los resultados oficiales y se va actualizando a medida que avanza el Mundial: primero los grupos, después cada llave de la eliminación. No hay que ir anotando nada a mano (aunque se puede corregir si hiciera falta).</p>
+      </div></div>
+
+      <div class="step"><div class="stepn">5</div><div class="stepc">
+        <h3>👀 Dónde mirar cada cosa</h3>
+        <div class="navhint">
+          <div class="nh"><b>🏆 Ranking</b>La tabla general de quién va ganando.</div>
+          <div class="nh"><b>📅 Hoy</b>Los partidos del día y qué pronosticó cada uno, con los puntos que sumó.</div>
+          <div class="nh"><b>🗺️ Llaves</b>El cuadro de eliminación, real o el de cada participante.</div>
+          <div class="nh"><b>🔍 Por jugador</b>Tu detalle completo: grupos y después tus llaves con los puntos.</div>
+        </div>
+      </div></div>
+
+      <div class="tip">🎯 <b>En resumen:</b> tú no haces nada — solo abres el tablero y miras cómo vas. Gana quien junte más puntos entre los aciertos de grupos y los de la eliminación.</div>
+    </div>
+  </section>
+</main>
+
+<script>
+const DATA = {"matches": [{"num": 1, "grupo": "A", "date": "jueves 11 junio", "loc": "MÉXICO", "vis": "SUDÁFRICA"}, {"num": 2, "grupo": "A", "date": "jueves 11 junio", "loc": "COREA DEL SUR", "vis": "REP. CHECA"}, {"num": 3, "grupo": "B", "date": "viernes 12 junio", "loc": "CANADÁ", "vis": "BOSNIA Y HERZEG."}, {"num": 4, "grupo": "D", "date": "viernes 12 junio", "loc": "ESTADOS UNIDOS", "vis": "PARAGUAY"}, {"num": 5, "grupo": "B", "date": "sábado 13 junio", "loc": "CATAR", "vis": "SUIZA"}, {"num": 6, "grupo": "C", "date": "sábado 13 junio", "loc": "BRASIL", "vis": "MARRUECOS"}, {"num": 7, "grupo": "C", "date": "sábado 13 junio", "loc": "HAITÍ", "vis": "ESCOCIA"}, {"num": 8, "grupo": "D", "date": "domingo 14 junio", "loc": "AUSTRALIA", "vis": "TURQUÍA"}, {"num": 9, "grupo": "E", "date": "domingo 14 junio", "loc": "ALEMANIA", "vis": "CURAZAO"}, {"num": 10, "grupo": "F", "date": "domingo 14 junio", "loc": "PAÍSES BAJOS", "vis": "JAPÓN"}, {"num": 11, "grupo": "E", "date": "domingo 14 junio", "loc": "COSTA DE MARFIL", "vis": "ECUADOR"}, {"num": 12, "grupo": "F", "date": "domingo 14 junio", "loc": "SUECIA", "vis": "TÚNEZ"}, {"num": 13, "grupo": "H", "date": "lunes 15 junio", "loc": "ESPAÑA", "vis": "CABO VERDE"}, {"num": 14, "grupo": "G", "date": "lunes 15 junio", "loc": "BÉLGICA", "vis": "EGIPTO"}, {"num": 15, "grupo": "H", "date": "lunes 15 junio", "loc": "ARABIA SAUDITA", "vis": "URUGUAY"}, {"num": 16, "grupo": "G", "date": "lunes 15 junio", "loc": "IRÁN", "vis": "NUEVA ZELANDA"}, {"num": 17, "grupo": "I", "date": "martes 16 junio", "loc": "FRANCIA", "vis": "SENEGAL"}, {"num": 18, "grupo": "I", "date": "martes 16 junio", "loc": "IRAK", "vis": "NORUEGA"}, {"num": 19, "grupo": "J", "date": "martes 16 junio", "loc": "ARGENTINA", "vis": "ARGELIA"}, {"num": 20, "grupo": "J", "date": "miércoles 17 junio", "loc": "AUSTRIA", "vis": "JORDANIA"}, {"num": 21, "grupo": "K", "date": "miércoles 17 junio", "loc": "PORTUGAL", "vis": "REP. DEL CONGO"}, {"num": 22, "grupo": "L", "date": "miércoles 17 junio", "loc": "INGLATERRA", "vis": "CROACIA"}, {"num": 23, "grupo": "L", "date": "miércoles 17 junio", "loc": "GHANA", "vis": "PANAMÁ"}, {"num": 24, "grupo": "K", "date": "miércoles 17 junio", "loc": "UZBEKISTÁN", "vis": "COLOMBIA"}, {"num": 25, "grupo": "A", "date": "jueves 18 junio", "loc": "REP. CHECA", "vis": "SUDÁFRICA"}, {"num": 26, "grupo": "B", "date": "jueves 18 junio", "loc": "SUIZA", "vis": "BOSNIA Y HERZEG."}, {"num": 27, "grupo": "B", "date": "jueves 18 junio", "loc": "CANADÁ", "vis": "CATAR"}, {"num": 28, "grupo": "A", "date": "jueves 18 junio", "loc": "MÉXICO", "vis": "COREA DEL SUR"}, {"num": 29, "grupo": "D", "date": "viernes 19 junio", "loc": "ESTADOS UNIDOS", "vis": "AUSTRALIA"}, {"num": 30, "grupo": "C", "date": "viernes 19 junio", "loc": "ESCOCIA", "vis": "MARRUECOS"}, {"num": 31, "grupo": "C", "date": "viernes 19 junio", "loc": "BRASIL", "vis": "HAITÍ"}, {"num": 32, "grupo": "D", "date": "viernes 19 junio", "loc": "TURQUÍA", "vis": "PARAGUAY"}, {"num": 33, "grupo": "F", "date": "sábado 20 junio", "loc": "PAÍSES BAJOS", "vis": "SUECIA"}, {"num": 34, "grupo": "E", "date": "sábado 20 junio", "loc": "ALEMANIA", "vis": "COSTA DE MARFIL"}, {"num": 35, "grupo": "E", "date": "sábado 20 junio", "loc": "ECUADOR", "vis": "CURAZAO"}, {"num": 36, "grupo": "F", "date": "domingo 21 junio", "loc": "TÚNEZ", "vis": "JAPÓN"}, {"num": 37, "grupo": "H", "date": "domingo 21 junio", "loc": "ESPAÑA", "vis": "ARABIA SAUDITA"}, {"num": 38, "grupo": "G", "date": "domingo 21 junio", "loc": "BÉLGICA", "vis": "IRÁN"}, {"num": 39, "grupo": "H", "date": "domingo 21 junio", "loc": "URUGUAY", "vis": "CABO VERDE"}, {"num": 40, "grupo": "G", "date": "domingo 21 junio", "loc": "NUEVA ZELANDA", "vis": "EGIPTO"}, {"num": 41, "grupo": "J", "date": "lunes 22 junio", "loc": "ARGENTINA", "vis": "AUSTRIA"}, {"num": 42, "grupo": "I", "date": "lunes 22 junio", "loc": "FRANCIA", "vis": "IRAK"}, {"num": 43, "grupo": "I", "date": "lunes 22 junio", "loc": "NORUEGA", "vis": "SENEGAL"}, {"num": 44, "grupo": "J", "date": "lunes 22 junio", "loc": "JORDANIA", "vis": "ARGELIA"}, {"num": 45, "grupo": "K", "date": "martes 23 junio", "loc": "PORTUGAL", "vis": "UZBEKISTÁN"}, {"num": 46, "grupo": "L", "date": "martes 23 junio", "loc": "INGLATERRA", "vis": "GHANA"}, {"num": 47, "grupo": "L", "date": "martes 23 junio", "loc": "PANAMÁ", "vis": "CROACIA"}, {"num": 48, "grupo": "K", "date": "martes 23 junio", "loc": "COLOMBIA", "vis": "REP. DEL CONGO"}, {"num": 49, "grupo": "B", "date": "miércoles 24 junio", "loc": "SUIZA", "vis": "CANADÁ"}, {"num": 50, "grupo": "B", "date": "miércoles 24 junio", "loc": "BOSNIA Y HERZEG.", "vis": "CATAR"}, {"num": 51, "grupo": "C", "date": "miércoles 24 junio", "loc": "ESCOCIA", "vis": "BRASIL"}, {"num": 52, "grupo": "C", "date": "miércoles 24 junio", "loc": "MARRUECOS", "vis": "HAITÍ"}, {"num": 53, "grupo": "A", "date": "miércoles 24 junio", "loc": "REP. CHECA", "vis": "MÉXICO"}, {"num": 54, "grupo": "A", "date": "miércoles 24 junio", "loc": "SUDÁFRICA", "vis": "COREA DEL SUR"}, {"num": 55, "grupo": "E", "date": "jueves 25 junio", "loc": "CURAZAO", "vis": "COSTA DE MARFIL"}, {"num": 56, "grupo": "E", "date": "jueves 25 junio", "loc": "ECUADOR", "vis": "ALEMANIA"}, {"num": 57, "grupo": "F", "date": "jueves 25 junio", "loc": "JAPÓN", "vis": "SUECIA"}, {"num": 58, "grupo": "F", "date": "jueves 25 junio", "loc": "TÚNEZ", "vis": "PAÍSES BAJOS"}, {"num": 59, "grupo": "D", "date": "jueves 25 junio", "loc": "TURQUÍA", "vis": "ESTADOS UNIDOS"}, {"num": 60, "grupo": "D", "date": "jueves 25 junio", "loc": "PARAGUAY", "vis": "AUSTRALIA"}, {"num": 61, "grupo": "I", "date": "viernes 26 junio", "loc": "NORUEGA", "vis": "FRANCIA"}, {"num": 62, "grupo": "I", "date": "viernes 26 junio", "loc": "SENEGAL", "vis": "IRAK"}, {"num": 63, "grupo": "H", "date": "viernes 26 junio", "loc": "CABO VERDE", "vis": "ARABIA SAUDITA"}, {"num": 64, "grupo": "H", "date": "viernes 26 junio", "loc": "URUGUAY", "vis": "ESPAÑA"}, {"num": 65, "grupo": "G", "date": "viernes 26 junio", "loc": "EGIPTO", "vis": "IRÁN"}, {"num": 66, "grupo": "G", "date": "viernes 26 junio", "loc": "NUEVA ZELANDA", "vis": "BÉLGICA"}, {"num": 67, "grupo": "L", "date": "sábado 27 junio", "loc": "PANAMÁ", "vis": "INGLATERRA"}, {"num": 68, "grupo": "L", "date": "sábado 27 junio", "loc": "CROACIA", "vis": "GHANA"}, {"num": 69, "grupo": "K", "date": "sábado 27 junio", "loc": "COLOMBIA", "vis": "PORTUGAL"}, {"num": 70, "grupo": "K", "date": "sábado 27 junio", "loc": "REP. DEL CONGO", "vis": "UZBEKISTÁN"}, {"num": 71, "grupo": "J", "date": "sábado 27 junio", "loc": "ARGELIA", "vis": "AUSTRIA"}, {"num": 72, "grupo": "J", "date": "sábado 27 junio", "loc": "JORDANIA", "vis": "ARGENTINA"}], "players": [{"name": "Fabián", "scores": {"1": [3, 1], "2": [1, 1], "3": [1, 1], "4": [2, 1], "5": [0, 2], "6": [2, 1], "7": [1, 3], "8": [2, 2], "9": [4, 0], "10": [2, 1], "11": [1, 2], "12": [0, 0], "13": [6, 0], "14": [2, 0], "15": [1, 2], "16": [1, 0], "17": [3, 0], "18": [0, 3], "19": [2, 1], "20": [1, 0], "21": [3, 0], "22": [1, 0], "23": [2, 0], "24": [0, 4], "25": [1, 0], "26": [1, 0], "27": [2, 1], "28": [1, 1], "29": [1, 0], "30": [1, 2], "31": [4, 0], "32": [1, 1], "33": [2, 1], "34": [2, 0], "35": [3, 0], "36": [1, 3], "37": [3, 1], "38": [2, 0], "39": [3, 0], "40": [1, 2], "41": [1, 0], "42": [3, 0], "43": [2, 1], "44": [1, 1], "45": [4, 0], "46": [1, 0], "47": [1, 3], "48": [3, 0], "49": [2, 1], "50": [1, 0], "51": [1, 3], "52": [3, 0], "53": [1, 2], "54": [1, 2], "55": [1, 3], "56": [1, 1], "57": [2, 1], "58": [1, 2], "59": [1, 1], "60": [2, 1], "61": [1, 2], "62": [1, 0], "63": [1, 2], "64": [0, 2], "65": [2, 1], "66": [0, 4], "67": [0, 3], "68": [2, 1], "69": [1, 2], "70": [1, 0], "71": [1, 1], "72": [1, 3]}, "bracket": {"r32": ["COREA DEL SUR", "CANADÁ", "BRASIL", "JAPÓN", "ALEMANIA", "ESCOCIA", "PAÍSES BAJOS", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "TURQUÍA", "MÉXICO", "ARABIA SAUDITA", "INGLATERRA", "COSTA DE MARFIL", "BÉLGICA", "REP. CHECA", "ESTADOS UNIDOS", "BOSNIA Y HERZEG.", "ESPAÑA", "AUSTRIA", "COLOMBIA", "CROACIA", "SUIZA", "IRÁN", "PARAGUAY", "EGIPTO", "ARGENTINA", "URUGUAY", "PORTUGAL", "GHANA"], "r16": ["COREA DEL SUR", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "BRASIL", "ECUADOR", "MÉXICO", "INGLATERRA", "CROACIA", "ESPAÑA", "ESTADOS UNIDOS", "BÉLGICA", "ARGENTINA", "PARAGUAY", "SUIZA", "PORTUGAL"], "qf": ["ALEMANIA", "PAÍSES BAJOS", "ESPAÑA", "BÉLGICA", "BRASIL", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["ALEMANIA", "ESPAÑA", "BRASIL", "PORTUGAL"], "final": ["ESPAÑA", "PORTUGAL"], "champ": "PORTUGAL", "sub": "ESPAÑA", "third": "BRASIL", "m_r32": [{"loc": "COREA DEL SUR", "vis": "CANADÁ", "gl": 2, "gv": 1, "win": "COREA DEL SUR"}, {"loc": "BRASIL", "vis": "JAPÓN", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "ESCOCIA", "gl": 3, "gv": 1, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "MARRUECOS", "gl": 1, "gv": 0, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 2, "gv": 0, "win": "ECUADOR"}, {"loc": "FRANCIA", "vis": "TURQUÍA", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "MÉXICO", "vis": "ARABIA SAUDITA", "gl": 2, "gv": 1, "win": "MÉXICO"}, {"loc": "INGLATERRA", "vis": "COSTA DE MARFIL", "gl": 2, "gv": 1, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "REP. CHECA", "gl": 1, "gv": 0, "win": "BÉLGICA"}, {"loc": "ESTADOS UNIDOS", "vis": "BOSNIA Y HERZEG.", "gl": 2, "gv": 0, "win": "ESTADOS UNIDOS"}, {"loc": "ESPAÑA", "vis": "AUSTRIA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 1, "gv": 2, "win": "CROACIA"}, {"loc": "SUIZA", "vis": "IRÁN", "gl": 1, "gv": 0, "win": "SUIZA"}, {"loc": "PARAGUAY", "vis": "EGIPTO", "gl": 1, "gv": 0, "win": "PARAGUAY"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "GHANA", "gl": 2, "gv": 0, "win": "PORTUGAL"}], "m_r16": [{"loc": "COREA DEL SUR", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 2, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 1, "gv": 0, "win": "ALEMANIA"}, {"loc": "BRASIL", "vis": "ECUADOR", "gl": 2, "gv": 0, "win": "BRASIL"}, {"loc": "MÉXICO", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "CROACIA", "vis": "ESPAÑA", "gl": 1, "gv": 3, "win": "ESPAÑA"}, {"loc": "ESTADOS UNIDOS", "vis": "BÉLGICA", "gl": 0, "gv": 1, "win": "BÉLGICA"}, {"loc": "ARGENTINA", "vis": "PARAGUAY", "gl": 2, "gv": 0, "win": "ARGENTINA"}, {"loc": "SUIZA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_qf": [{"loc": "ALEMANIA", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 0, "win": "ALEMANIA"}, {"loc": "ESPAÑA", "vis": "BÉLGICA", "gl": 2, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_sf": [{"loc": "ALEMANIA", "vis": "ESPAÑA", "gl": 1, "gv": 2, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_fin": [{"loc": "ALEMANIA", "vis": "BRASIL", "gl": 1, "gv": 2, "win": "BRASIL"}, {"loc": "ESPAÑA", "vis": "PORTUGAL", "gl": 0, "gv": 1, "win": "PORTUGAL"}]}}, {"name": "Benja", "scores": {"1": [2, 1], "2": [1, 1], "3": [3, 1], "4": [0, 1], "5": [0, 0], "6": [3, 1], "7": [1, 1], "8": [0, 2], "9": [4, 0], "10": [3, 1], "11": [0, 2], "12": [1, 1], "13": [4, 0], "14": [2, 0], "15": [0, 3], "16": [0, 1], "17": [5, 0], "18": [1, 2], "19": [3, 0], "20": [3, 2], "21": [2, 0], "22": [3, 2], "23": [0, 2], "24": [0, 2], "25": [1, 1], "26": [1, 1], "27": [1, 0], "28": [2, 1], "29": [1, 2], "30": [1, 2], "31": [3, 0], "32": [1, 2], "33": [3, 1], "34": [4, 0], "35": [2, 1], "36": [0, 1], "37": [3, 0], "38": [2, 1], "39": [2, 0], "40": [0, 1], "41": [3, 0], "42": [3, 0], "43": [1, 0], "44": [0, 0], "45": [1, 0], "46": [2, 0], "47": [0, 1], "48": [2, 0], "49": [1, 1], "50": [0, 0], "51": [0, 3], "52": [1, 0], "53": [0, 1], "54": [0, 1], "55": [0, 0], "56": [1, 3], "57": [0, 0], "58": [0, 2], "59": [1, 1], "60": [1, 0], "61": [1, 2], "62": [1, 0], "63": [0, 0], "64": [1, 3], "65": [1, 0], "66": [0, 2], "67": [0, 1], "68": [2, 0], "69": [2, 1], "70": [0, 0], "71": [1, 1], "72": [0, 3]}, "bracket": {"r32": ["COREA DEL SUR", "SUIZA", "BRASIL", "JAPÓN", "ALEMANIA", "AUSTRALIA", "PAÍSES BAJOS", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "NUEVA ZELANDA", "MÉXICO", "SUECIA", "INGLATERRA", "SENEGAL", "BÉLGICA", "REP. CHECA", "PARAGUAY", "CATAR", "ESPAÑA", "AUSTRIA", "PORTUGAL", "CROACIA", "CANADÁ", "ARGELIA", "TURQUÍA", "EGIPTO", "ARGENTINA", "URUGUAY", "COLOMBIA", "PANAMÁ"], "r16": ["SUIZA", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "BRASIL", "ECUADOR", "MÉXICO", "INGLATERRA", "PORTUGAL", "ESPAÑA", "PARAGUAY", "BÉLGICA", "ARGENTINA", "EGIPTO", "CANADÁ", "COLOMBIA"], "qf": ["FRANCIA", "PAÍSES BAJOS", "ESPAÑA", "PARAGUAY", "BRASIL", "INGLATERRA", "ARGENTINA", "COLOMBIA"], "sf": ["FRANCIA", "ESPAÑA", "BRASIL", "ARGENTINA"], "final": ["ESPAÑA", "ARGENTINA"], "champ": "ESPAÑA", "sub": "ARGENTINA", "third": "FRANCIA", "m_r32": [{"loc": "COREA DEL SUR", "vis": "SUIZA", "gl": 1, "gv": 2, "win": "SUIZA"}, {"loc": "BRASIL", "vis": "JAPÓN", "gl": 3, "gv": 0, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "AUSTRALIA", "gl": 2, "gv": 0, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "MARRUECOS", "gl": 1, "gv": 0, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 0, "win": "ECUADOR"}, {"loc": "FRANCIA", "vis": "NUEVA ZELANDA", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "MÉXICO", "vis": "SUECIA", "gl": 1, "gv": 0, "win": "MÉXICO"}, {"loc": "INGLATERRA", "vis": "SENEGAL", "gl": 2, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "REP. CHECA", "gl": 3, "gv": 1, "win": "BÉLGICA"}, {"loc": "PARAGUAY", "vis": "CATAR", "gl": 2, "gv": 1, "win": "PARAGUAY"}, {"loc": "ESPAÑA", "vis": "AUSTRIA", "gl": 3, "gv": 0, "win": "ESPAÑA"}, {"loc": "PORTUGAL", "vis": "CROACIA", "gl": 2, "gv": 1, "win": "PORTUGAL"}, {"loc": "CANADÁ", "vis": "ARGELIA", "gl": 1, "gv": 0, "win": "CANADÁ"}, {"loc": "TURQUÍA", "vis": "EGIPTO", "gl": 1, "gv": 2, "win": "EGIPTO"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 3, "gv": 1, "win": "ARGENTINA"}, {"loc": "COLOMBIA", "vis": "PANAMÁ", "gl": 2, "gv": 1, "win": "COLOMBIA"}], "m_r16": [{"loc": "SUIZA", "vis": "PAÍSES BAJOS", "gl": 0, "gv": 3, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 0, "gv": 2, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "ECUADOR", "gl": 3, "gv": 1, "win": "BRASIL"}, {"loc": "MÉXICO", "vis": "INGLATERRA", "gl": 0, "gv": 2, "win": "INGLATERRA"}, {"loc": "PORTUGAL", "vis": "ESPAÑA", "gl": 0, "gv": 2, "win": "ESPAÑA"}, {"loc": "PARAGUAY", "vis": "BÉLGICA", "gl": 1, "gv": 0, "win": "PARAGUAY"}, {"loc": "ARGENTINA", "vis": "EGIPTO", "gl": 3, "gv": 0, "win": "ARGENTINA"}, {"loc": "CANADÁ", "vis": "COLOMBIA", "gl": 0, "gv": 2, "win": "COLOMBIA"}], "m_qf": [{"loc": "FRANCIA", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "PARAGUAY", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ARGENTINA", "vis": "COLOMBIA", "gl": 2, "gv": 1, "win": "ARGENTINA"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 0, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "ARGENTINA", "gl": 1, "gv": 2, "win": "ARGENTINA"}], "m_fin": [{"loc": "FRANCIA", "vis": "BRASIL", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "ARGENTINA", "gl": 2, "gv": 1, "win": "ESPAÑA"}]}}, {"name": "Diego", "scores": {"1": [2, 0], "2": [1, 1], "3": [2, 1], "4": [2, 1], "5": [0, 2], "6": [2, 1], "7": [0, 2], "8": [0, 2], "9": [4, 0], "10": [2, 1], "11": [1, 1], "12": [1, 0], "13": [5, 0], "14": [2, 0], "15": [1, 1], "16": [1, 0], "17": [2, 1], "18": [0, 3], "19": [3, 0], "20": [2, 0], "21": [3, 0], "22": [2, 0], "23": [1, 1], "24": [0, 2], "25": [2, 1], "26": [1, 1], "27": [2, 0], "28": [2, 1], "29": [2, 0], "30": [0, 2], "31": [5, 0], "32": [1, 1], "33": [2, 0], "34": [2, 1], "35": [4, 0], "36": [0, 2], "37": [2, 0], "38": [2, 0], "39": [3, 0], "40": [0, 2], "41": [2, 1], "42": [4, 0], "43": [1, 1], "44": [0, 1], "45": [2, 0], "46": [3, 1], "47": [0, 2], "48": [2, 0], "49": [1, 1], "50": [2, 1], "51": [0, 2], "52": [6, 0], "53": [0, 1], "54": [0, 2], "55": [0, 3], "56": [0, 1], "57": [2, 1], "58": [0, 2], "59": [0, 1], "60": [2, 1], "61": [1, 2], "62": [1, 0], "63": [1, 1], "64": [0, 2], "65": [1, 1], "66": [0, 3], "67": [0, 2], "68": [1, 0], "69": [1, 1], "70": [1, 0], "71": [0, 2], "72": [0, 3]}, "bracket": {"r32": ["COREA DEL SUR", "SUIZA", "BRASIL", "JAPÓN", "ALEMANIA", "PARAGUAY", "PAÍSES BAJOS", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "SUECIA", "MÉXICO", "ESCOCIA", "INGLATERRA", "SENEGAL", "BÉLGICA", "REP. CHECA", "ESTADOS UNIDOS", "BOSNIA Y HERZEG.", "ESPAÑA", "AUSTRIA", "COLOMBIA", "CROACIA", "CANADÁ", "IRÁN", "TURQUÍA", "EGIPTO", "ARGENTINA", "URUGUAY", "PORTUGAL", "COSTA DE MARFIL"], "r16": ["SUIZA", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "BRASIL", "NORUEGA", "MÉXICO", "INGLATERRA", "COLOMBIA", "ESPAÑA", "ESTADOS UNIDOS", "BÉLGICA", "ARGENTINA", "TURQUÍA", "CANADÁ", "PORTUGAL"], "qf": ["FRANCIA", "PAÍSES BAJOS", "ESPAÑA", "ESTADOS UNIDOS", "BRASIL", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["FRANCIA", "ESPAÑA", "BRASIL", "ARGENTINA"], "final": ["ESPAÑA", "ARGENTINA"], "champ": "ESPAÑA", "sub": "ARGENTINA", "third": "FRANCIA", "m_r32": [{"loc": "COREA DEL SUR", "vis": "SUIZA", "gl": 1, "gv": 2, "win": "SUIZA"}, {"loc": "BRASIL", "vis": "JAPÓN", "gl": 2, "gv": 0, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "PARAGUAY", "gl": 2, "gv": 0, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "MARRUECOS", "gl": 1, "gv": 0, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 2, "win": "NORUEGA"}, {"loc": "FRANCIA", "vis": "SUECIA", "gl": 3, "gv": 0, "win": "FRANCIA"}, {"loc": "MÉXICO", "vis": "ESCOCIA", "gl": 1, "gv": 0, "win": "MÉXICO"}, {"loc": "INGLATERRA", "vis": "SENEGAL", "gl": 2, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "REP. CHECA", "gl": 2, "gv": 0, "win": "BÉLGICA"}, {"loc": "ESTADOS UNIDOS", "vis": "BOSNIA Y HERZEG.", "gl": 2, "gv": 0, "win": "ESTADOS UNIDOS"}, {"loc": "ESPAÑA", "vis": "AUSTRIA", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 2, "gv": 1, "win": "COLOMBIA"}, {"loc": "CANADÁ", "vis": "IRÁN", "gl": 2, "gv": 1, "win": "CANADÁ"}, {"loc": "TURQUÍA", "vis": "EGIPTO", "gl": 1, "gv": 0, "win": "TURQUÍA"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 0, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "COSTA DE MARFIL", "gl": 2, "gv": 1, "win": "PORTUGAL"}], "m_r16": [{"loc": "SUIZA", "vis": "PAÍSES BAJOS", "gl": 0, "gv": 1, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 1, "gv": 2, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "NORUEGA", "gl": 2, "gv": 0, "win": "BRASIL"}, {"loc": "MÉXICO", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "COLOMBIA", "vis": "ESPAÑA", "gl": 1, "gv": 3, "win": "ESPAÑA"}, {"loc": "ESTADOS UNIDOS", "vis": "BÉLGICA", "gl": 1, "gv": 0, "win": "ESTADOS UNIDOS"}, {"loc": "ARGENTINA", "vis": "TURQUÍA", "gl": 3, "gv": 0, "win": "ARGENTINA"}, {"loc": "CANADÁ", "vis": "PORTUGAL", "gl": 0, "gv": 1, "win": "PORTUGAL"}], "m_qf": [{"loc": "FRANCIA", "vis": "PAÍSES BAJOS", "gl": 2, "gv": 1, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "ESTADOS UNIDOS", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 1, "gv": 0, "win": "ARGENTINA"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 1, "gv": 2, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "ARGENTINA", "gl": 1, "gv": 2, "win": "ARGENTINA"}], "m_fin": [{"loc": "FRANCIA", "vis": "BRASIL", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "ARGENTINA", "gl": 2, "gv": 1, "win": "ESPAÑA"}]}}, {"name": "Marcelo", "scores": {"1": [1, 0], "2": [1, 1], "3": [2, 1], "4": [1, 0], "5": [0, 2], "6": [1, 1], "7": [0, 2], "8": [1, 2], "9": [3, 0], "10": [1, 1], "11": [0, 1], "12": [1, 0], "13": [2, 0], "14": [2, 0], "15": [0, 1], "16": [1, 0], "17": [2, 0], "18": [1, 2], "19": [2, 0], "20": [1, 1], "21": [3, 0], "22": [2, 1], "23": [1, 0], "24": [0, 2], "25": [2, 0], "26": [1, 1], "27": [null, null], "28": [1, 1], "29": [2, 1], "30": [1, 2], "31": [3, 0], "32": [1, 0], "33": [2, 1], "34": [3, 1], "35": [2, 0], "36": [0, 1], "37": [2, 0], "38": [3, 1], "39": [2, 0], "40": [1, 1], "41": [1, 0], "42": [3, 0], "43": [2, 1], "44": [0, 1], "45": [3, 0], "46": [2, 1], "47": [0, 2], "48": [3, 1], "49": [1, 1], "50": [2, 1], "51": [1, 2], "52": [3, 0], "53": [1, 1], "54": [1, 2], "55": [0, 2], "56": [0, 2], "57": [1, 1], "58": [0, 3], "59": [1, 1], "60": [1, 0], "61": [0, 2], "62": [1, 0], "63": [0, 1], "64": [0, 1], "65": [1, 2], "66": [1, 3], "67": [0, 3], "68": [2, 1], "69": [1, 2], "70": [1, 2], "71": [1, 1], "72": [0, 2]}, "bracket": {"r32": ["COREA DEL SUR", "CANADÁ", "BRASIL", "JAPÓN", "ALEMANIA", "PARAGUAY", "PAÍSES BAJOS", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "SUECIA", "REP. CHECA", "ESCOCIA", "INGLATERRA", "SENEGAL", "BÉLGICA", "MÉXICO", "ESTADOS UNIDOS", "BOSNIA Y HERZEG.", "ESPAÑA", "ARGELIA", "COLOMBIA", "CROACIA", "SUIZA", "COSTA DE MARFIL", "TURQUÍA", "IRÁN", "ARGENTINA", "URUGUAY", "PORTUGAL", "GHANA"], "r16": ["COREA DEL SUR", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "BRASIL", "ECUADOR", "REP. CHECA", "INGLATERRA", "COLOMBIA", "ESPAÑA", "ESTADOS UNIDOS", "BÉLGICA", "ARGENTINA", "TURQUÍA", "SUIZA", "PORTUGAL"], "qf": ["FRANCIA", "PAÍSES BAJOS", "ESPAÑA", "BÉLGICA", "BRASIL", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["FRANCIA", "ESPAÑA", "INGLATERRA", "PORTUGAL"], "final": ["FRANCIA", "PORTUGAL"], "champ": "FRANCIA", "sub": "PORTUGAL", "third": "ESPAÑA", "m_r32": [{"loc": "COREA DEL SUR", "vis": "CANADÁ", "gl": 2, "gv": 1, "win": "COREA DEL SUR"}, {"loc": "BRASIL", "vis": "JAPÓN", "gl": 1, "gv": 0, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "PARAGUAY", "gl": 3, "gv": 1, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "MARRUECOS", "gl": 2, "gv": 1, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 0, "win": "ECUADOR"}, {"loc": "FRANCIA", "vis": "SUECIA", "gl": 2, "gv": 1, "win": "FRANCIA"}, {"loc": "REP. CHECA", "vis": "ESCOCIA", "gl": 2, "gv": 1, "win": "REP. CHECA"}, {"loc": "INGLATERRA", "vis": "SENEGAL", "gl": 1, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "MÉXICO", "gl": 2, "gv": 0, "win": "BÉLGICA"}, {"loc": "ESTADOS UNIDOS", "vis": "BOSNIA Y HERZEG.", "gl": 1, "gv": 0, "win": "ESTADOS UNIDOS"}, {"loc": "ESPAÑA", "vis": "ARGELIA", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 2, "gv": 1, "win": "COLOMBIA"}, {"loc": "SUIZA", "vis": "COSTA DE MARFIL", "gl": 1, "gv": 0, "win": "SUIZA"}, {"loc": "TURQUÍA", "vis": "IRÁN", "gl": 3, "gv": 1, "win": "TURQUÍA"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "GHANA", "gl": 2, "gv": 0, "win": "PORTUGAL"}], "m_r16": [{"loc": "COREA DEL SUR", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 3, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 1, "gv": 2, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "ECUADOR", "gl": 2, "gv": 0, "win": "BRASIL"}, {"loc": "REP. CHECA", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "COLOMBIA", "vis": "ESPAÑA", "gl": 1, "gv": 3, "win": "ESPAÑA"}, {"loc": "ESTADOS UNIDOS", "vis": "BÉLGICA", "gl": 0, "gv": 2, "win": "BÉLGICA"}, {"loc": "ARGENTINA", "vis": "TURQUÍA", "gl": 1, "gv": 0, "win": "ARGENTINA"}, {"loc": "SUIZA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_qf": [{"loc": "FRANCIA", "vis": "PAÍSES BAJOS", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "BÉLGICA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "INGLATERRA", "vis": "PORTUGAL", "gl": 0, "gv": 1, "win": "PORTUGAL"}], "m_fin": [{"loc": "ESPAÑA", "vis": "INGLATERRA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "FRANCIA", "vis": "PORTUGAL", "gl": 2, "gv": 1, "win": "FRANCIA"}]}}, {"name": "Tomás Diego", "scores": {"1": [2, 0], "2": [2, 1], "3": [1, 1], "4": [1, 0], "5": [0, 2], "6": [1, 1], "7": [0, 2], "8": [1, 2], "9": [3, 0], "10": [1, 1], "11": [0, 1], "12": [1, 0], "13": [2, 0], "14": [2, 0], "15": [0, 1], "16": [1, 0], "17": [2, 0], "18": [1, 2], "19": [2, 0], "20": [1, 1], "21": [3, 0], "22": [2, 1], "23": [1, 0], "24": [0, 2], "25": [2, 0], "26": [1, 1], "27": [null, null], "28": [1, 1], "29": [2, 1], "30": [1, 2], "31": [3, 0], "32": [1, 0], "33": [2, 1], "34": [3, 1], "35": [2, 0], "36": [0, 1], "37": [2, 0], "38": [3, 1], "39": [2, 0], "40": [1, 1], "41": [1, 0], "42": [3, 0], "43": [2, 1], "44": [0, 1], "45": [3, 0], "46": [2, 1], "47": [0, 2], "48": [3, 1], "49": [1, 1], "50": [2, 1], "51": [1, 2], "52": [3, 0], "53": [1, 1], "54": [1, 2], "55": [0, 2], "56": [0, 2], "57": [1, 1], "58": [0, 3], "59": [1, 1], "60": [1, 0], "61": [0, 2], "62": [1, 0], "63": [0, 1], "64": [0, 1], "65": [1, 2], "66": [1, 3], "67": [0, 3], "68": [2, 1], "69": [1, 2], "70": [1, 2], "71": [1, 1], "72": [0, 2]}, "bracket": {"r32": ["REP. CHECA", "CANADÁ", "MARRUECOS", "JAPÓN", "ALEMANIA", "PARAGUAY", "PAÍSES BAJOS", "BRASIL", "ECUADOR", "NORUEGA", "FRANCIA", "SUECIA", "COREA DEL SUR", "ESCOCIA", "INGLATERRA", "COSTA DE MARFIL", "BÉLGICA", "MÉXICO", "TURQUÍA", "BOSNIA Y HERZEG.", "ESPAÑA", "ARGELIA", "COLOMBIA", "CROACIA", "SUIZA", "NUEVA ZELANDA", "ESTADOS UNIDOS", "EGIPTO", "ARGENTINA", "URUGUAY", "PORTUGAL", "GHANA"], "r16": ["REP. CHECA", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "MARRUECOS", "ECUADOR", "COREA DEL SUR", "INGLATERRA", "COLOMBIA", "ESPAÑA", "TURQUÍA", "BÉLGICA", "ARGENTINA", "ESTADOS UNIDOS", "SUIZA", "PORTUGAL"], "qf": ["FRANCIA", "PAÍSES BAJOS", "ESPAÑA", "BÉLGICA", "MARRUECOS", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["FRANCIA", "ESPAÑA", "INGLATERRA", "PORTUGAL"], "final": ["FRANCIA", "PORTUGAL"], "champ": "FRANCIA", "sub": "PORTUGAL", "third": "ESPAÑA", "m_r32": [{"loc": "REP. CHECA", "vis": "CANADÁ", "gl": 2, "gv": 1, "win": "REP. CHECA"}, {"loc": "MARRUECOS", "vis": "JAPÓN", "gl": 1, "gv": 0, "win": "MARRUECOS"}, {"loc": "ALEMANIA", "vis": "PARAGUAY", "gl": 3, "gv": 1, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "BRASIL", "gl": 2, "gv": 1, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 0, "win": "ECUADOR"}, {"loc": "FRANCIA", "vis": "SUECIA", "gl": 2, "gv": 1, "win": "FRANCIA"}, {"loc": "COREA DEL SUR", "vis": "ESCOCIA", "gl": 2, "gv": 1, "win": "COREA DEL SUR"}, {"loc": "INGLATERRA", "vis": "COSTA DE MARFIL", "gl": 1, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "MÉXICO", "gl": 2, "gv": 0, "win": "BÉLGICA"}, {"loc": "TURQUÍA", "vis": "BOSNIA Y HERZEG.", "gl": 1, "gv": 0, "win": "TURQUÍA"}, {"loc": "ESPAÑA", "vis": "ARGELIA", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 2, "gv": 1, "win": "COLOMBIA"}, {"loc": "SUIZA", "vis": "NUEVA ZELANDA", "gl": 1, "gv": 0, "win": "SUIZA"}, {"loc": "ESTADOS UNIDOS", "vis": "EGIPTO", "gl": 3, "gv": 1, "win": "ESTADOS UNIDOS"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "GHANA", "gl": 2, "gv": 0, "win": "PORTUGAL"}], "m_r16": [{"loc": "REP. CHECA", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 3, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 1, "gv": 2, "win": "FRANCIA"}, {"loc": "MARRUECOS", "vis": "ECUADOR", "gl": 2, "gv": 0, "win": "MARRUECOS"}, {"loc": "COREA DEL SUR", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "COLOMBIA", "vis": "ESPAÑA", "gl": 1, "gv": 3, "win": "ESPAÑA"}, {"loc": "TURQUÍA", "vis": "BÉLGICA", "gl": 0, "gv": 2, "win": "BÉLGICA"}, {"loc": "ARGENTINA", "vis": "ESTADOS UNIDOS", "gl": 1, "gv": 0, "win": "ARGENTINA"}, {"loc": "SUIZA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_qf": [{"loc": "FRANCIA", "vis": "PAÍSES BAJOS", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "BÉLGICA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "MARRUECOS", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "INGLATERRA", "vis": "PORTUGAL", "gl": 0, "gv": 1, "win": "PORTUGAL"}], "m_fin": [{"loc": "ESPAÑA", "vis": "INGLATERRA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "FRANCIA", "vis": "PORTUGAL", "gl": 2, "gv": 1, "win": "FRANCIA"}]}}, {"name": "Daniel Br", "scores": {"1": [1, 0], "2": [0, 0], "3": [2, 1], "4": [0, 1], "5": [0, 2], "6": [1, 0], "7": [0, 2], "8": [0, 2], "9": [3, 0], "10": [2, 0], "11": [1, 1], "12": [1, 1], "13": [3, 0], "14": [2, 0], "15": [0, 1], "16": [1, 1], "17": [2, 0], "18": [0, 2], "19": [2, 0], "20": [2, 0], "21": [3, 0], "22": [2, 1], "23": [1, 0], "24": [0, 2], "25": [1, 0], "26": [1, 0], "27": [2, 0], "28": [1, 0], "29": [1, 0], "30": [0, 1], "31": [3, 0], "32": [1, 1], "33": [2, 1], "34": [2, 0], "35": [2, 0], "36": [1, 2], "37": [3, 0], "38": [2, 0], "39": [2, 0], "40": [1, 2], "41": [2, 1], "42": [2, 0], "43": [2, 1], "44": [1, 1], "45": [2, 0], "46": [1, 0], "47": [0, 2], "48": [2, 0], "49": [1, 1], "50": [1, 0], "51": [1, 3], "52": [1, 0], "53": [1, 2], "54": [0, 1], "55": [0, 1], "56": [1, 2], "57": [1, 1], "58": [0, 1], "59": [2, 1], "60": [1, 0], "61": [0, 2], "62": [2, 0], "63": [0, 1], "64": [1, 2], "65": [1, 0], "66": [0, 2], "67": [0, 3], "68": [2, 1], "69": [1, 1], "70": [0, 0], "71": [1, 2], "72": [0, 2]}, "bracket": {"r32": ["REP. CHECA", "SUIZA", "BRASIL", "JAPÓN", "ALEMANIA", "ESCOCIA", "PAÍSES BAJOS", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "ESTADOS UNIDOS", "MÉXICO", "ARABIA SAUDITA", "INGLATERRA", "SENEGAL", "BÉLGICA", "COREA DEL SUR", "TURQUÍA", "BOSNIA Y HERZEG.", "ESPAÑA", "AUSTRIA", "COLOMBIA", "CROACIA", "CANADÁ", "COSTA DE MARFIL", "PARAGUAY", "EGIPTO", "ARGENTINA", "URUGUAY", "PORTUGAL", "GHANA"], "r16": ["SUIZA", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "BRASIL", "ECUADOR", "MÉXICO", "INGLATERRA", "CROACIA", "ESPAÑA", "TURQUÍA", "BÉLGICA", "ARGENTINA", "PARAGUAY", "CANADÁ", "PORTUGAL"], "qf": ["FRANCIA", "PAÍSES BAJOS", "ESPAÑA", "TURQUÍA", "BRASIL", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["FRANCIA", "ESPAÑA", "BRASIL", "ARGENTINA"], "final": ["FRANCIA", "BRASIL"], "champ": "FRANCIA", "sub": "BRASIL", "third": "ESPAÑA", "m_r32": [{"loc": "REP. CHECA", "vis": "SUIZA", "gl": 1, "gv": 2, "win": "SUIZA"}, {"loc": "BRASIL", "vis": "JAPÓN", "gl": 2, "gv": 0, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "ESCOCIA", "gl": 2, "gv": 0, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "MARRUECOS", "gl": 1, "gv": 0, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 0, "win": "ECUADOR"}, {"loc": "FRANCIA", "vis": "ESTADOS UNIDOS", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "MÉXICO", "vis": "ARABIA SAUDITA", "gl": 1, "gv": 0, "win": "MÉXICO"}, {"loc": "INGLATERRA", "vis": "SENEGAL", "gl": 1, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "COREA DEL SUR", "gl": 2, "gv": 1, "win": "BÉLGICA"}, {"loc": "TURQUÍA", "vis": "BOSNIA Y HERZEG.", "gl": 2, "gv": 1, "win": "TURQUÍA"}, {"loc": "ESPAÑA", "vis": "AUSTRIA", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 1, "gv": 2, "win": "CROACIA"}, {"loc": "CANADÁ", "vis": "COSTA DE MARFIL", "gl": 1, "gv": 0, "win": "CANADÁ"}, {"loc": "PARAGUAY", "vis": "EGIPTO", "gl": 1, "gv": 0, "win": "PARAGUAY"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "GHANA", "gl": 2, "gv": 1, "win": "PORTUGAL"}], "m_r16": [{"loc": "SUIZA", "vis": "PAÍSES BAJOS", "gl": 0, "gv": 2, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 0, "gv": 2, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "ECUADOR", "gl": 3, "gv": 1, "win": "BRASIL"}, {"loc": "MÉXICO", "vis": "INGLATERRA", "gl": 0, "gv": 2, "win": "INGLATERRA"}, {"loc": "CROACIA", "vis": "ESPAÑA", "gl": 0, "gv": 2, "win": "ESPAÑA"}, {"loc": "TURQUÍA", "vis": "BÉLGICA", "gl": 1, "gv": 0, "win": "TURQUÍA"}, {"loc": "ARGENTINA", "vis": "PARAGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "CANADÁ", "vis": "PORTUGAL", "gl": 0, "gv": 1, "win": "PORTUGAL"}], "m_qf": [{"loc": "FRANCIA", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "TURQUÍA", "gl": 2, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 2, "gv": 1, "win": "ARGENTINA"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "ARGENTINA", "gl": 2, "gv": 1, "win": "BRASIL"}], "m_fin": [{"loc": "ESPAÑA", "vis": "ARGENTINA", "gl": 2, "gv": 0, "win": "ESPAÑA"}, {"loc": "FRANCIA", "vis": "BRASIL", "gl": 2, "gv": 1, "win": "FRANCIA"}]}}, {"name": "Daniel", "scores": {"1": [3, 0], "2": [2, 1], "3": [1, 1], "4": [1, 0], "5": [1, 4], "6": [2, 2], "7": [1, 2], "8": [0, 2], "9": [5, 0], "10": [0, 1], "11": [0, 0], "12": [1, 0], "13": [4, 0], "14": [2, 1], "15": [1, 2], "16": [3, 1], "17": [3, 2], "18": [1, 4], "19": [2, 0], "20": [2, 0], "21": [3, 1], "22": [2, 1], "23": [2, 1], "24": [1, 3], "25": [3, 1], "26": [1, 1], "27": [2, 1], "28": [1, 1], "29": [1, 1], "30": [2, 2], "31": [3, 0], "32": [1, 0], "33": [2, 1], "34": [3, 1], "35": [2, 0], "36": [1, 2], "37": [3, 0], "38": [3, 1], "39": [3, 0], "40": [1, 3], "41": [3, 1], "42": [6, 0], "43": [4, 3], "44": [0, 1], "45": [1, 0], "46": [2, 1], "47": [2, 3], "48": [2, 1], "49": [2, 2], "50": [2, 0], "51": [0, 2], "52": [2, 0], "53": [0, 0], "54": [0, 2], "55": [1, 3], "56": [0, 0], "57": [2, 3], "58": [0, 3], "59": [1, 1], "60": [2, 1], "61": [3, 3], "62": [2, 0], "63": [1, 2], "64": [1, 3], "65": [1, 1], "66": [1, 3], "67": [2, 4], "68": [1, 0], "69": [2, 1], "70": [3, 1], "71": [1, 1], "72": [0, 3]}, "bracket": {"r32": ["MÉXICO", "BOSNIA Y HERZEG.", "BRASIL", "PAÍSES BAJOS", "ALEMANIA", "ESCOCIA", "SUECIA", "MARRUECOS", "ECUADOR", "NORUEGA", "FRANCIA", "JAPÓN", "COREA DEL SUR", "COSTA DE MARFIL", "INGLATERRA", "ARGELIA", "BÉLGICA", "REP. CHECA", "TURQUÍA", "CANADÁ", "ESPAÑA", "AUSTRIA", "PORTUGAL", "CROACIA", "SUIZA", "IRÁN", "ESTADOS UNIDOS", "EGIPTO", "ARGENTINA", "URUGUAY", "COLOMBIA", "SENEGAL"], "r16": ["MÉXICO", "MARRUECOS", "ALEMANIA", "FRANCIA", "BRASIL", "NORUEGA", "COSTA DE MARFIL", "INGLATERRA", "PORTUGAL", "ESPAÑA", "TURQUÍA", "BÉLGICA", "ARGENTINA", "EGIPTO", "SUIZA", "COLOMBIA"], "qf": ["FRANCIA", "MARRUECOS", "ESPAÑA", "BÉLGICA", "BRASIL", "INGLATERRA", "ARGENTINA", "COLOMBIA"], "sf": ["FRANCIA", "ESPAÑA", "BRASIL", "ARGENTINA"], "final": ["ESPAÑA", "BRASIL"], "champ": "ESPAÑA", "sub": "BRASIL", "third": "FRANCIA", "m_r32": [{"loc": "MÉXICO", "vis": "BOSNIA Y HERZEG.", "gl": 1, "gv": 0, "win": "MÉXICO"}, {"loc": "BRASIL", "vis": "PAÍSES BAJOS", "gl": 2, "gv": 1, "win": "BRASIL"}, {"loc": "ALEMANIA", "vis": "ESCOCIA", "gl": 3, "gv": 1, "win": "ALEMANIA"}, {"loc": "SUECIA", "vis": "MARRUECOS", "gl": 0, "gv": 2, "win": "MARRUECOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 2, "win": "NORUEGA"}, {"loc": "FRANCIA", "vis": "JAPÓN", "gl": 3, "gv": 2, "win": "FRANCIA"}, {"loc": "COREA DEL SUR", "vis": "COSTA DE MARFIL", "gl": 1, "gv": 2, "win": "COSTA DE MARFIL"}, {"loc": "INGLATERRA", "vis": "ARGELIA", "gl": 3, "gv": 0, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "REP. CHECA", "gl": 2, "gv": 1, "win": "BÉLGICA"}, {"loc": "TURQUÍA", "vis": "CANADÁ", "gl": 2, "gv": 0, "win": "TURQUÍA"}, {"loc": "ESPAÑA", "vis": "AUSTRIA", "gl": 4, "gv": 1, "win": "ESPAÑA"}, {"loc": "PORTUGAL", "vis": "CROACIA", "gl": 3, "gv": 1, "win": "PORTUGAL"}, {"loc": "SUIZA", "vis": "IRÁN", "gl": 1, "gv": 0, "win": "SUIZA"}, {"loc": "ESTADOS UNIDOS", "vis": "EGIPTO", "gl": 0, "gv": 1, "win": "EGIPTO"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 2, "gv": 1, "win": "ARGENTINA"}, {"loc": "COLOMBIA", "vis": "SENEGAL", "gl": 1, "gv": 0, "win": "COLOMBIA"}], "m_r16": [{"loc": "MÉXICO", "vis": "MARRUECOS", "gl": 1, "gv": 2, "win": "MARRUECOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 0, "gv": 2, "win": "FRANCIA"}, {"loc": "BRASIL", "vis": "NORUEGA", "gl": 3, "gv": 2, "win": "BRASIL"}, {"loc": "COSTA DE MARFIL", "vis": "INGLATERRA", "gl": 0, "gv": 1, "win": "INGLATERRA"}, {"loc": "PORTUGAL", "vis": "ESPAÑA", "gl": 1, "gv": 2, "win": "ESPAÑA"}, {"loc": "TURQUÍA", "vis": "BÉLGICA", "gl": 1, "gv": 2, "win": "BÉLGICA"}, {"loc": "ARGENTINA", "vis": "EGIPTO", "gl": 3, "gv": 1, "win": "ARGENTINA"}, {"loc": "SUIZA", "vis": "COLOMBIA", "gl": 1, "gv": 2, "win": "COLOMBIA"}], "m_qf": [{"loc": "FRANCIA", "vis": "MARRUECOS", "gl": 2, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "BÉLGICA", "gl": 1, "gv": 0, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "INGLATERRA", "gl": 3, "gv": 1, "win": "BRASIL"}, {"loc": "ARGENTINA", "vis": "COLOMBIA", "gl": 1, "gv": 0, "win": "ARGENTINA"}], "m_sf": [{"loc": "FRANCIA", "vis": "ESPAÑA", "gl": 0, "gv": 1, "win": "ESPAÑA"}, {"loc": "BRASIL", "vis": "ARGENTINA", "gl": 2, "gv": 0, "win": "BRASIL"}], "m_fin": [{"loc": "FRANCIA", "vis": "ARGENTINA", "gl": 1, "gv": 0, "win": "FRANCIA"}, {"loc": "ESPAÑA", "vis": "BRASIL", "gl": 2, "gv": 1, "win": "ESPAÑA"}]}}, {"name": "Oscar", "scores": {"1": [1, 1], "2": [3, 2], "3": [1, 2], "4": [1, 2], "5": [1, 2], "6": [2, 2], "7": [1, 3], "8": [1, 2], "9": [4, 0], "10": [3, 1], "11": [2, 3], "12": [2, 0], "13": [4, 0], "14": [2, 1], "15": [1, 2], "16": [2, 0], "17": [1, 0], "18": [0, 1], "19": [2, 1], "20": [2, 0], "21": [3, 0], "22": [2, 2], "23": [3, 1], "24": [1, 2], "25": [2, 1], "26": [2, 0], "27": [1, 0], "28": [2, 2], "29": [3, 0], "30": [0, 2], "31": [3, 0], "32": [1, 1], "33": [2, 1], "34": [2, 1], "35": [4, 1], "36": [0, 1], "37": [2, 0], "38": [3, 1], "39": [3, 1], "40": [1, 3], "41": [2, 0], "42": [3, 0], "43": [2, 1], "44": [1, 4], "45": [3, 1], "46": [2, 2], "47": [1, 3], "48": [3, 1], "49": [2, 2], "50": [1, 1], "51": [0, 2], "52": [5, 0], "53": [0, 1], "54": [1, 1], "55": [0, 3], "56": [2, 3], "57": [1, 1], "58": [0, 2], "59": [1, 2], "60": [3, 1], "61": [1, 3], "62": [2, 2], "63": [1, 2], "64": [1, 1], "65": [2, 1], "66": [0, 3], "67": [1, 4], "68": [2, 2], "69": [2, 2], "70": [1, 2], "71": [0, 0], "72": [1, 3]}, "bracket": {"r32": ["MÉXICO", "BOSNIA Y HERZEG.", "MARRUECOS", "SUECIA", "ALEMANIA", "TURQUÍA", "PAÍSES BAJOS", "BRASIL", "ECUADOR", "NORUEGA", "FRANCIA", "JAPÓN", "COREA DEL SUR", "COSTA DE MARFIL", "INGLATERRA", "AUSTRIA", "BÉLGICA", "REP. CHECA", "PARAGUAY", "CANADÁ", "ESPAÑA", "ARGELIA", "COLOMBIA", "CROACIA", "SUIZA", "IRÁN", "ESTADOS UNIDOS", "EGIPTO", "ARGENTINA", "URUGUAY", "PORTUGAL", "GHANA"], "r16": ["MÉXICO", "PAÍSES BAJOS", "ALEMANIA", "FRANCIA", "MARRUECOS", "NORUEGA", "COREA DEL SUR", "INGLATERRA", "COLOMBIA", "ESPAÑA", "PARAGUAY", "BÉLGICA", "ARGENTINA", "ESTADOS UNIDOS", "SUIZA", "PORTUGAL"], "qf": ["ALEMANIA", "PAÍSES BAJOS", "ESPAÑA", "BÉLGICA", "MARRUECOS", "INGLATERRA", "ARGENTINA", "PORTUGAL"], "sf": ["ALEMANIA", "ESPAÑA", "MARRUECOS", "PORTUGAL"], "final": ["ESPAÑA", "PORTUGAL"], "champ": "ESPAÑA", "sub": "PORTUGAL", "third": "ALEMANIA", "m_r32": [{"loc": "MÉXICO", "vis": "BOSNIA Y HERZEG.", "gl": 2, "gv": 1, "win": "MÉXICO"}, {"loc": "MARRUECOS", "vis": "SUECIA", "gl": 3, "gv": 2, "win": "MARRUECOS"}, {"loc": "ALEMANIA", "vis": "TURQUÍA", "gl": 3, "gv": 1, "win": "ALEMANIA"}, {"loc": "PAÍSES BAJOS", "vis": "BRASIL", "gl": 2, "gv": 1, "win": "PAÍSES BAJOS"}, {"loc": "ECUADOR", "vis": "NORUEGA", "gl": 1, "gv": 2, "win": "NORUEGA"}, {"loc": "FRANCIA", "vis": "JAPÓN", "gl": 3, "gv": 1, "win": "FRANCIA"}, {"loc": "COREA DEL SUR", "vis": "COSTA DE MARFIL", "gl": 2, "gv": 1, "win": "COREA DEL SUR"}, {"loc": "INGLATERRA", "vis": "AUSTRIA", "gl": 2, "gv": 1, "win": "INGLATERRA"}, {"loc": "BÉLGICA", "vis": "REP. CHECA", "gl": 2, "gv": 1, "win": "BÉLGICA"}, {"loc": "PARAGUAY", "vis": "CANADÁ", "gl": 2, "gv": 1, "win": "PARAGUAY"}, {"loc": "ESPAÑA", "vis": "ARGELIA", "gl": 3, "gv": 1, "win": "ESPAÑA"}, {"loc": "COLOMBIA", "vis": "CROACIA", "gl": 2, "gv": 1, "win": "COLOMBIA"}, {"loc": "SUIZA", "vis": "IRÁN", "gl": 3, "gv": 1, "win": "SUIZA"}, {"loc": "ESTADOS UNIDOS", "vis": "EGIPTO", "gl": 3, "gv": 1, "win": "ESTADOS UNIDOS"}, {"loc": "ARGENTINA", "vis": "URUGUAY", "gl": 3, "gv": 2, "win": "ARGENTINA"}, {"loc": "PORTUGAL", "vis": "GHANA", "gl": 3, "gv": 1, "win": "PORTUGAL"}], "m_r16": [{"loc": "MÉXICO", "vis": "PAÍSES BAJOS", "gl": 1, "gv": 2, "win": "PAÍSES BAJOS"}, {"loc": "ALEMANIA", "vis": "FRANCIA", "gl": 1, "gv": 0, "win": "ALEMANIA"}, {"loc": "MARRUECOS", "vis": "NORUEGA", "gl": 2, "gv": 1, "win": "MARRUECOS"}, {"loc": "COREA DEL SUR", "vis": "INGLATERRA", "gl": 1, "gv": 2, "win": "INGLATERRA"}, {"loc": "COLOMBIA", "vis": "ESPAÑA", "gl": 2, "gv": 3, "win": "ESPAÑA"}, {"loc": "PARAGUAY", "vis": "BÉLGICA", "gl": 1, "gv": 2, "win": "BÉLGICA"}, {"loc": "ARGENTINA", "vis": "ESTADOS UNIDOS", "gl": 3, "gv": 1, "win": "ARGENTINA"}, {"loc": "SUIZA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_qf": [{"loc": "ALEMANIA", "vis": "PAÍSES BAJOS", "gl": 2, "gv": 1, "win": "ALEMANIA"}, {"loc": "ESPAÑA", "vis": "BÉLGICA", "gl": 2, "gv": 1, "win": "ESPAÑA"}, {"loc": "MARRUECOS", "vis": "INGLATERRA", "gl": 2, "gv": 0, "win": "MARRUECOS"}, {"loc": "ARGENTINA", "vis": "PORTUGAL", "gl": 1, "gv": 2, "win": "PORTUGAL"}], "m_sf": [{"loc": "ALEMANIA", "vis": "ESPAÑA", "gl": 1, "gv": 2, "win": "ESPAÑA"}, {"loc": "MARRUECOS", "vis": "PORTUGAL", "gl": 2, "gv": 3, "win": "PORTUGAL"}], "m_fin": [{"loc": "ALEMANIA", "vis": "MARRUECOS", "gl": 2, "gv": 1, "win": "ALEMANIA"}, {"loc": "ESPAÑA", "vis": "PORTUGAL", "gl": 2, "gv": 1, "win": "ESPAÑA"}]}}], "teams": ["ALEMANIA", "ARABIA SAUDITA", "ARGELIA", "ARGENTINA", "AUSTRALIA", "AUSTRIA", "BOSNIA Y HERZEG.", "BRASIL", "BÉLGICA", "CABO VERDE", "CANADÁ", "CATAR", "COLOMBIA", "COREA DEL SUR", "COSTA DE MARFIL", "CROACIA", "CURAZAO", "ECUADOR", "EGIPTO", "ESCOCIA", "ESPAÑA", "ESTADOS UNIDOS", "FRANCIA", "GHANA", "HAITÍ", "INGLATERRA", "IRAK", "IRÁN", "JAPÓN", "JORDANIA", "MARRUECOS", "MÉXICO", "NORUEGA", "NUEVA ZELANDA", "PANAMÁ", "PARAGUAY", "PAÍSES BAJOS", "PORTUGAL", "REP. CHECA", "REP. DEL CONGO", "SENEGAL", "SUDÁFRICA", "SUECIA", "SUIZA", "TURQUÍA", "TÚNEZ", "URUGUAY", "UZBEKISTÁN"], "groups": {"A": ["MÉXICO", "SUDÁFRICA", "COREA DEL SUR", "REP. CHECA"], "B": ["CANADÁ", "BOSNIA Y HERZEG.", "CATAR", "SUIZA"], "C": ["BRASIL", "MARRUECOS", "HAITÍ", "ESCOCIA"], "D": ["ESTADOS UNIDOS", "PARAGUAY", "AUSTRALIA", "TURQUÍA"], "E": ["ALEMANIA", "CURAZAO", "COSTA DE MARFIL", "ECUADOR"], "F": ["PAÍSES BAJOS", "JAPÓN", "SUECIA", "TÚNEZ"], "G": ["BÉLGICA", "EGIPTO", "IRÁN", "NUEVA ZELANDA"], "H": ["ESPAÑA", "CABO VERDE", "ARABIA SAUDITA", "URUGUAY"], "I": ["FRANCIA", "SENEGAL", "IRAK", "NORUEGA"], "J": ["ARGENTINA", "ARGELIA", "AUSTRIA", "JORDANIA"], "K": ["PORTUGAL", "REP. DEL CONGO", "UZBEKISTÁN", "COLOMBIA"], "L": ["INGLATERRA", "CROACIA", "GHANA", "PANAMÁ"]}};
+const FLAGS = {"MÉXICO": "🇲🇽", "SUDÁFRICA": "🇿🇦", "COREA DEL SUR": "🇰🇷", "REP. CHECA": "🇨🇿", "CANADÁ": "🇨🇦", "BOSNIA Y HERZEG.": "🇧🇦", "CATAR": "🇶🇦", "SUIZA": "🇨🇭", "BRASIL": "🇧🇷", "MARRUECOS": "🇲🇦", "HAITÍ": "🇭🇹", "ESCOCIA": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "ESTADOS UNIDOS": "🇺🇸", "PARAGUAY": "🇵🇾", "AUSTRALIA": "🇦🇺", "TURQUÍA": "🇹🇷", "ALEMANIA": "🇩🇪", "CURAZAO": "🇨🇼", "COSTA DE MARFIL": "🇨🇮", "ECUADOR": "🇪🇨", "PAÍSES BAJOS": "🇳🇱", "JAPÓN": "🇯🇵", "SUECIA": "🇸🇪", "TÚNEZ": "🇹🇳", "BÉLGICA": "🇧🇪", "EGIPTO": "🇪🇬", "IRÁN": "🇮🇷", "NUEVA ZELANDA": "🇳🇿", "ESPAÑA": "🇪🇸", "CABO VERDE": "🇨🇻", "ARABIA SAUDITA": "🇸🇦", "URUGUAY": "🇺🇾", "FRANCIA": "🇫🇷", "SENEGAL": "🇸🇳", "IRAK": "🇮🇶", "NORUEGA": "🇳🇴", "ARGENTINA": "🇦🇷", "ARGELIA": "🇩🇿", "AUSTRIA": "🇦🇹", "JORDANIA": "🇯🇴", "PORTUGAL": "🇵🇹", "REP. DEL CONGO": "🇨🇩", "UZBEKISTÁN": "🇺🇿", "COLOMBIA": "🇨🇴", "INGLATERRA": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "CROACIA": "🇭🇷", "GHANA": "🇬🇭", "PANAMÁ": "🇵🇦"};
+const CFG = {exacto:5,signo:3, r32:2,r16:4,qf:6,sf:9,fin:12, tercero:12,sub:15,campeon:25};
+const ROUNDS=[['r32','Dieciseisavos',CFG.r32],['r16','Octavos',CFG.r16],['qf','Cuartos',CFG.qf],['sf','Semifinales',CFG.sf],['final','Final',CFG.fin]];
+const LS='pollaMundial2026_v2';
+const teams=DATA.teams;
+const fl=t=>FLAGS[t]||'🏳️';
+const BIDERMAN=new Set(['Fabián','Diego','Oscar','Daniel']);
+const clubOf=n=>BIDERMAN.has(n)?'BID':'BRE';
+const clubRank=n=>BIDERMAN.has(n)?0:1;
+
+const ENG2TPL={"Mexico":"MÉXICO","South Africa":"SUDÁFRICA","South Korea":"COREA DEL SUR","Czech Republic":"REP. CHECA","Canada":"CANADÁ","Bosnia & Herzegovina":"BOSNIA Y HERZEG.","Qatar":"CATAR","Switzerland":"SUIZA","Brazil":"BRASIL","Morocco":"MARRUECOS","Haiti":"HAITÍ","Scotland":"ESCOCIA","USA":"ESTADOS UNIDOS","Paraguay":"PARAGUAY","Australia":"AUSTRALIA","Turkey":"TURQUÍA","Germany":"ALEMANIA","Curaçao":"CURAZAO","Ivory Coast":"COSTA DE MARFIL","Ecuador":"ECUADOR","Netherlands":"PAÍSES BAJOS","Japan":"JAPÓN","Sweden":"SUECIA","Tunisia":"TÚNEZ","Belgium":"BÉLGICA","Egypt":"EGIPTO","Iran":"IRÁN","New Zealand":"NUEVA ZELANDA","Spain":"ESPAÑA","Cape Verde":"CABO VERDE","Saudi Arabia":"ARABIA SAUDITA","Uruguay":"URUGUAY","France":"FRANCIA","Senegal":"SENEGAL","Iraq":"IRAK","Norway":"NORUEGA","Argentina":"ARGENTINA","Algeria":"ARGELIA","Austria":"AUSTRIA","Jordan":"JORDANIA","Portugal":"PORTUGAL","DR Congo":"REP. DEL CONGO","Uzbekistan":"UZBEKISTÁN","Colombia":"COLOMBIA","England":"INGLATERRA","Croatia":"CROACIA","Ghana":"GHANA","Panama":"PANAMÁ"};
+const OPENFOOTBALL_URL="https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
+const mkey=(a,b)=>[a,b].sort().join('::');
+const MIDX={}; DATA.matches.forEach(m=>MIDX[mkey(m.loc,m.vis)]=m);
+
+let state={scores:{}, rounds:{r32:[],r16:[],qf:[],sf:[],final:[]}, champ:'', sub:'', third:'', realKO:null};
+function loadState(){
+  if(location.hash.startsWith('#r=')){ try{ state=JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(3))))); fixState(); persist(); return; }catch(e){} }
+  const raw=localStorage.getItem(LS); if(raw){ try{ state=JSON.parse(raw); }catch(e){} }
+  fixState();
+}
+function fixState(){
+  state.scores=state.scores||{};
+  state.rounds=Object.assign({r32:[],r16:[],qf:[],sf:[],final:[]}, state.rounds||{});
+  if(state.champ===undefined)state.champ=''; if(state.sub===undefined)state.sub=''; if(state.third===undefined)state.third='';
+}
+function persist(){ localStorage.setItem(LS,JSON.stringify(state)); const f=document.getElementById('saveflash'); if(f){f.style.opacity=1;setTimeout(()=>f.style.opacity=0,800);} }
+
+/* ---------- puntaje ---------- */
+function sgn(a,b){ if(a==null||b==null||a===''||b==='')return null; a=+a;b=+b; return a>b?'L':(a<b?'V':'E'); }
+function matchPts(pred,real){
+  if(!real||real[0]==null||real[1]==null||real[0]===''||real[1]==='')return{p:0,k:'none'};
+  if(!pred||pred[0]==null||pred[1]==null)return{p:0,k:'none'};
+  if(+pred[0]===+real[0]&&+pred[1]===+real[1])return{p:CFG.exacto,k:'exact'};
+  if(sgn(pred[0],pred[1])===sgn(real[0],real[1]))return{p:CFG.signo,k:'sign'};
+  return{p:0,k:'miss'};
+}
+function inter(pred,real){ const R=new Set(real); let c=0; for(const t of new Set(pred)) if(R.has(t))c++; return c; }
+let finalOn = localStorage.getItem('pollaFinalOn')!=='0';
+function groupsComplete(){ return played()===DATA.matches.length; }
+function countsFinal(){ return finalOn || groupsComplete(); }
+function provisionalR32(){
+  const out=[];
+  [...new Set(DATA.matches.map(m=>m.grupo))].forEach(g=>{ groupStandings(g).forEach((o,i)=>{ if(i<2&&o.pj>=1) out.push(o.t); }); });
+  return out;
+}
+function liveRounds(){
+  const r=state.rounds;
+  return { r32:(r.r32&&r.r32.length)?r.r32:provisionalR32(), r16:r.r16, qf:r.qf, sf:r.sf, final:r.final };
+}
+function calc(p){
+  let grp=0,exact=0,sign=0;
+  for(const m of DATA.matches){ const r=matchPts(p.scores[m.num],state.scores[m.num]); grp+=r.p; if(r.k==='exact')exact++; if(r.k==='sign')sign++; }
+  const b=p.bracket||{}; const st={}; const L=liveRounds();
+  st.r32=inter(b.r32||[],L.r32)*CFG.r32;
+  st.r16=inter(b.r16||[],L.r16)*CFG.r16;
+  st.qf=inter(b.qf||[],L.qf)*CFG.qf;
+  st.sf=inter(b.sf||[],L.sf)*CFG.sf;
+  st.fin=inter(b.final||[],L.final)*CFG.fin;
+  st.third=(state.third&&b.third===state.third)?CFG.tercero:0;
+  st.sub=(state.sub&&b.sub===state.sub)?CFG.sub:0;
+  st.camp=(state.champ&&b.champ===state.champ)?CFG.campeon:0;
+  const fin=st.r32+st.r16+st.qf+st.sf+st.fin+st.third+st.sub+st.camp;
+  return {grp,fin,total:grp+(countsFinal()?fin:0),exact,sign,st};
+}
+function played(){ return DATA.matches.filter(m=>{const r=state.scores[m.num];return r&&r[0]!=null&&r[1]!=null&&r[0]!==''&&r[1]!=='';}).length; }
+function currentStage(){
+  if(state.champ)return'Campeón';
+  for(const [k,lab] of [['final','Final'],['sf','Semifinales'],['qf','Cuartos'],['r16','Octavos'],['r32','Dieciseisavos']]) if((state.rounds[k]||[]).length)return lab;
+  return'Grupos';
+}
+
+/* ---------- ranking ---------- */
+let chTot,chSplit;
+function renderRanking(){
+  const cf=countsFinal(), gc=groupsComplete();
+  const tw=document.getElementById('finalToggleWrap');
+  if(gc){ tw.innerHTML=''; }
+  else { tw.innerHTML=`<button class="btn ${finalOn?'':'sec'}" id="btnFinalToggle">Puntos de fase final: ${finalOn?'incluidos ✓':'ocultos'}</button> <span class="small">durante la fase de grupos son provisionales — puedes incluirlos o no en el total</span>`;
+    document.getElementById('btnFinalToggle').onclick=()=>{ finalOn=!finalOn; localStorage.setItem('pollaFinalOn',finalOn?'1':'0'); renderRanking(); }; }
+  const rows=DATA.players.map(p=>({name:p.name,...calc(p)}));
+  rows.sort((a,b)=>b.total-a.total||clubRank(a.name)-clubRank(b.name)||b.grp-a.grp||a.name.localeCompare(b.name));
+  const max=Math.max(1,...rows.map(r=>r.total));
+  const tb=document.getElementById('rankBody'); tb.innerHTML='';
+  rows.forEach((r,i)=>{
+    const pos=i+1, med=pos<=3?`<span class="medal m${pos}">${pos}</span>`:pos;
+    const tr=document.createElement('tr'); tr.className='rk-row';
+    tr.innerHTML=`<td class="pos">${med}</td><td class="pname">${r.name}</td><td class="num"><span class="ptot">${r.total}</span></td>
+      <td class="num">${r.grp}</td><td class="num" style="${cf?'':'opacity:.35'}">${r.fin}</td>
+      <td><div class="bar"><span data-w="${(r.total/max*100).toFixed(0)}"></span></div></td>`;
+    tr.onclick=()=>{ openTab('detalle'); document.getElementById('playerSel').value=DATA.players.findIndex(p=>p.name===r.name); drawDetalle(); };
+    tb.appendChild(tr);
+  });
+  requestAnimationFrame(()=>tb.querySelectorAll('.bar>span').forEach(s=>s.style.width=s.dataset.w+'%'));
+  document.getElementById('hLeader').textContent=rows[0]&&rows[0].total>0?rows[0].name:'—';
+  document.getElementById('hPlayed').textContent=played()+'/72';
+  document.getElementById('hStage').textContent=currentStage();
+  const avg=Math.round(rows.reduce((s,r)=>s+r.total,0)/rows.length);
+  document.getElementById('kpis').innerHTML=
+   `<div class="k"><div class="v">${played()}<span style="font-size:13px;color:var(--muted)">/72</span></div><div class="l">Partidos jugados</div></div>
+    <div class="k"><div class="v">${rows[0]?rows[0].total:0}</div><div class="l">Puntaje del líder</div></div>
+    <div class="k"><div class="v">${avg}</div><div class="l">Promedio</div></div>
+    <div class="k"><div class="v">+${rows[0]?(rows[0].total-(rows[1]?rows[1].total:0)):0}</div><div class="l">Ventaja 1°-2°</div></div>`;
+  const labels=rows.map(r=>r.name);
+  if(chTot)chTot.destroy();
+  chTot=new Chart(document.getElementById('chTot'),{type:'bar',data:{labels,datasets:[{data:rows.map(r=>r.total),backgroundColor:'#16a34a',borderRadius:6}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f1f3'}},y:{grid:{display:false}}}}});
+  if(chSplit)chSplit.destroy();
+  chSplit=new Chart(document.getElementById('chSplit'),{type:'bar',data:{labels,datasets:[{label:'Grupos',data:rows.map(r=>r.grp),backgroundColor:'#3b82f6',borderRadius:4},{label:'Eliminación',data:rows.map(r=>r.fin),backgroundColor:'#eab308',borderRadius:4}]},options:{plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f0f1f3'}}}}});
+  // efecto según el líder: fuegos si Biderman, desagrado sutil si Breitling
+  const top=rows[0]; window.__leaderName=top?top.name:''; window.__leaderClub=(top&&top.total>0)?clubOf(top.name):null;
+  const rankVisible=document.getElementById('tab-ranking').style.display!=='none';
+  if(window.__leaderClub && rankVisible && lastCeleb!==window.__leaderName){ lastCeleb=window.__leaderName; window.__leaderClub==='BID'?fireworks():boo(); }
+  if(!window.__leaderClub) lastCeleb='';
+}
+
+let lastCeleb='';
+function boo(){
+  const layer=document.createElement('div'); layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden';
+  const emo=['🙄','😒','😐','👎'];
+  for(let i=0;i<7;i++){ const s=document.createElement('div'); s.textContent=emo[i%emo.length];
+    s.style.cssText=`position:absolute;top:-50px;left:${5+Math.random()*86}%;font-size:${20+Math.random()*16}px;filter:grayscale(1);opacity:0`;
+    layer.appendChild(s);
+    s.animate([{transform:'translateY(0)',opacity:0},{opacity:.45,offset:.18},{opacity:.45,offset:.8},{transform:`translateY(${innerHeight+90}px)`,opacity:0}],{duration:2400+Math.random()*1400,delay:Math.random()*600,easing:'ease-in'});
+  }
+  document.body.appendChild(layer); setTimeout(()=>layer.remove(),4600);
+}
+function fireworks(){
+  const cv=document.getElementById('fw'); if(!cv)return;
+  cv.style.display='block'; cv.width=innerWidth; cv.height=innerHeight;
+  const ctx=cv.getContext('2d'); const parts=[]; const cols=['#16a34a','#eab308','#3b82f6','#e4002b','#a855f7','#22d3ee','#fff'];
+  function burst(x,y){ const n=46, col=cols[Math.random()*cols.length|0]; for(let i=0;i<n;i++){const a=Math.PI*2*i/n,s=2+Math.random()*4.5;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:55+Math.random()*30,col});} }
+  for(let i=0;i<3;i++) burst(cv.width*(0.28+0.22*i), cv.height*(0.34+0.06*i));
+  const start=performance.now();
+  function frame(now){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(now-start<2400 && Math.random()<0.09) burst(Math.random()*cv.width, Math.random()*cv.height*0.55+40);
+    for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.x+=p.vx;p.y+=p.vy;p.vy+=0.045;p.vx*=0.99;p.life--;
+      ctx.globalAlpha=Math.max(0,p.life/70); ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,2.6,0,7); ctx.fill();
+      if(p.life<=0)parts.splice(i,1); }
+    ctx.globalAlpha=1;
+    if(now-start<3000 || parts.length) requestAnimationFrame(frame); else cv.style.display='none';
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- resultados grupos ---------- */
+let grpF='Todos';
+function renderGrpFilter(){
+  const grps=['Todos',...new Set(DATA.matches.map(m=>m.grupo))];
+  const c=document.getElementById('grpFilter'); c.innerHTML='';
+  grps.forEach(g=>{ const b=document.createElement('button'); b.textContent=g==='Todos'?'Todos':'Grupo '+g; if(g===grpF)b.className='on'; b.onclick=()=>{grpF=g;renderGrpFilter();renderMatchInputs();renderStandings();}; c.appendChild(b); });
+}
+function renderMatchInputs(){
+  const cont=document.getElementById('matchInputs'); cont.innerHTML=''; let last='';
+  for(const m of DATA.matches){
+    if(grpF!=='Todos'&&m.grupo!==grpF)continue;
+    if(m.date!==last){last=m.date;cont.insertAdjacentHTML('beforeend',`<div class="date-h">${m.date}</div>`);}
+    const r=state.scores[m.num]||['',''];
+    const row=document.createElement('div'); row.className='mrow';
+    row.innerHTML=`<span class="mn">${m.num}</span><span class="gp">${m.grupo}</span>
+      <span class="tl"><span class="nm">${m.loc}</span><span class="flag">${fl(m.loc)}</span></span>
+      <span class="sb"><input type="number" min="0" data-n="${m.num}" data-s="0" value="${r[0]??''}"><span style="color:var(--muted)">:</span><input type="number" min="0" data-n="${m.num}" data-s="1" value="${r[1]??''}"></span>
+      <span class="tv"><span class="flag">${fl(m.vis)}</span><span class="nm">${m.vis}</span></span>`;
+    cont.appendChild(row);
+  }
+  cont.querySelectorAll('input').forEach(inp=>{ if(inp.value!=='')inp.classList.add('filled');
+    inp.addEventListener('input',e=>{ const n=e.target.dataset.n,s=+e.target.dataset.s; if(!state.scores[n])state.scores[n]=['',''];
+      state.scores[n][s]=e.target.value===''?'':+e.target.value; e.target.classList.toggle('filled',e.target.value!=='');
+      persist(); renderRanking(); renderStandings(); }); });
+}
+
+/* ---------- tabla de posiciones ---------- */
+function groupStandings(g, scores){
+  scores=scores||state.scores;
+  const T={}; const ms=DATA.matches.filter(m=>m.grupo===g);
+  ms.forEach(m=>[m.loc,m.vis].forEach(t=>{ if(!T[t])T[t]={t,pj:0,g:0,e:0,p:0,gf:0,gc:0}; }));
+  ms.forEach(m=>{ const r=scores[m.num]; if(!r||r[0]==null||r[1]==null||r[0]===''||r[1]==='')return;
+    const a=T[m.loc],b=T[m.vis],x=+r[0],y=+r[1]; a.pj++;b.pj++;a.gf+=x;a.gc+=y;b.gf+=y;b.gc+=x;
+    if(x>y){a.g++;b.p++;}else if(x<y){b.g++;a.p++;}else{a.e++;b.e++;} });
+  return Object.values(T).map(o=>({...o,pts:o.g*3+o.e,dg:o.gf-o.gc}))
+    .sort((p,q)=>q.pts-p.pts||q.dg-p.dg||q.gf-p.gf||p.t.localeCompare(q.t));
+}
+function standingsCardHTML(g, scores, lab){
+  const arr=groupStandings(g, scores);
+  const played=DATA.matches.filter(m=>m.grupo===g&&scores[m.num]&&scores[m.num][0]!=null&&scores[m.num][0]!=='').length;
+  let rows=''; arr.forEach((o,i)=>{ const cls=i===0?'q1':i===1?'q2':i===2?'q3':''; const dot=i<2?'g':i===2?'y':'n';
+    rows+=`<tr class="${cls}"><td class="pos"><span class="qd ${dot}"></span>${i+1}</td><td class="tn"><span class="flag">${fl(o.t)}</span>${o.t}</td><td>${o.pj}</td><td>${o.dg>0?'+':''}${o.dg}</td><td class="ptscol">${o.pts}</td></tr>`; });
+  return `<div class="gcard"><div class="gh"><span>Grupo ${g}</span><span class="pl">${played}/6 ${lab||'jugados'}</span></div>
+    <table class="gtab"><thead><tr><th></th><th class="l">Equipo</th><th>PJ</th><th>DG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderStandings(){
+  const wrap=document.getElementById('standingsWrap'); if(!wrap)return;
+  const grupos=(grpF&&grpF!=='Todos')?[grpF]:[...new Set(DATA.matches.map(m=>m.grupo))];
+  wrap.innerHTML=grupos.map(g=>standingsCardHTML(g,state.scores)).join('');
+}
+
+/* ---------- avance por ronda + posiciones ---------- */
+function fillSel(el,val){ el.innerHTML='<option value="">—</option>'+teams.map(t=>`<option ${t===val?'selected':''}>${fl(t)} ${t}</option>`).join(''); }
+function renderAdvance(){
+  ['rCamp','rSub','rThird'].forEach((id,i)=>{ const el=document.getElementById(id); fillSel(el,[state.champ,state.sub,state.third][i]);
+    el.onchange=e=>{ const v=e.target.value.replace(/^[^\sA-Za-zÁ]+ /,''); const t=teams.find(x=>e.target.value.endsWith(x))||''; if(id==='rCamp')state.champ=t; if(id==='rSub')state.sub=t; if(id==='rThird')state.third=t; persist(); renderRanking(); renderBracket(); }; });
+  const tb=document.getElementById('advBody'); tb.innerHTML='';
+  teams.forEach(t=>{
+    const tr=document.createElement('tr');
+    let cells=`<td class="tname"><span class="flag">${fl(t)}</span>${t}</td>`;
+    ['r32','r16','qf','sf','final'].forEach(rk=>{ const on=(state.rounds[rk]||[]).includes(t); cells+=`<td><input type="checkbox" data-r="${rk}" data-t="${t}" ${on?'checked':''}></td>`; });
+    tr.innerHTML=cells; tb.appendChild(tr);
+  });
+  tb.querySelectorAll('input').forEach(c=>c.addEventListener('change',e=>{
+    const rk=e.target.dataset.r,t=e.target.dataset.t,arr=state.rounds[rk];
+    const i=arr.indexOf(t); if(e.target.checked&&i<0)arr.push(t); if(!e.target.checked&&i>=0)arr.splice(i,1);
+    persist(); renderRanking(); renderBracket();
+  }));
+}
+
+/* ---------- bracket ---------- */
+let brkView='REAL';
+function renderBrkSel(){
+  const c=document.getElementById('brkSel'); c.innerHTML='';
+  const opts=[['REAL','🌍 Cuadro real'],...DATA.players.map(p=>[p.name,p.name])];
+  opts.forEach(([v,lab])=>{ const b=document.createElement('button'); b.textContent=lab; if(v===brkView)b.className='on'; b.onclick=()=>{brkView=v;renderBrkSel();renderBracket();}; c.appendChild(b); });
+}
+function tieHTML(loc,vis,gl,gv,win,hitSet){
+  function side(t,sc){ if(!t)return`<div class="t"><span class="flag">🏳️</span><span class="nm small">—</span></div>`;
+    let cls=''; if(hitSet){ cls=hitSet.has(t)?'hit':'miss'; } else if(win){ cls=(t===win)?'win':''; }
+    return `<div class="t ${cls}"><span class="flag">${fl(t)}</span><span class="nm">${t}</span><span class="sc">${sc==null?'':sc}</span></div>`; }
+  return `<div class="tie">${side(loc,gl)}${side(vis,gv)}</div>`;
+}
+function champBannerHTML(champ,third,champHit,thirdHit,champPts,thirdPts,totalFin){
+  let extra='';
+  if(totalFin!=null) extra=`<div class="cwin" style="border-color:var(--green);background:linear-gradient(120deg,#f0fdf4,#fff)"><div class="cflag">🎯</div><div><div class="clab" style="color:#15803d">Puntos de eliminación</div><div class="cname">${totalFin}</div></div></div>`;
+  return `<div class="cwin ${champHit?'hit':''}"><div class="cflag">${champ?fl(champ):'🏆'}</div><div><div class="clab">Campeón ${champHit?'✓ +'+(champPts||0):''}</div><div class="cname">${champ||'por definir'}</div></div></div>
+    <div class="cwin bronze ${thirdHit?'hit':''}"><div class="cflag">${third?fl(third):'🥉'}</div><div><div class="clab">Tercer lugar ${thirdHit?'✓ +'+(thirdPts||0):''}</div><div class="cname" style="font-size:18px">${third||'por definir'}</div></div></div>`+extra;
+}
+function setChampBanner(champ,third,champHit,thirdHit,champPts,thirdPts,totalFin){
+  document.getElementById('champBanner').innerHTML=champBannerHTML(champ,third,champHit,thirdHit,champPts,thirdPts,totalFin);
+}
+function mkCol(lab,tiesHTML,ptsTxt){
+  const col=document.createElement('div'); col.className='bcol';
+  col.innerHTML=`<div class="rh">${lab}${ptsTxt||''}</div><div class="ties">${tiesHTML}</div>`;
+  return col;
+}
+const RN={r32:16,r16:8,qf:4,sf:2,final:1};
+function renderBracket(){
+  const wrap=document.getElementById('bracketWrap'); wrap.innerHTML='';
+  if(brkView==='REAL'){
+    setChampBanner(state.champ,state.third,false,false);
+    const ko=state.realKO;
+    [['r32','Dieciseisavos'],['r16','Octavos'],['qf','Cuartos'],['sf','Semifinales'],['final','Final']].forEach(([rk,lab])=>{
+      let ties='', ptsTxt=''; const cross=ko&&ko[rk]&&ko[rk].some(x=>x&&(x.loc||x.vis));
+      if(cross){
+        for(let i=0;i<RN[rk];i++){ const fm=ko[rk][i]; ties+= fm?tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win,null):placeholderTie(); }
+      } else {
+        const exp={r32:32,r16:16,qf:8,sf:4,final:2}[rk]; let tl=state.rounds[rk]||[];
+        if(rk==='r32' && tl.length===0){ tl=provisionalR32(); if(tl.length) ptsTxt=' · <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">provisional</span>'; }
+        for(let i=0;i<exp;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
+      }
+      wrap.appendChild(mkCol(lab,ties,ptsTxt));
+    });
+    return;
+  }
+  const p=DATA.players.find(x=>x.name===brkView); const b=p.bracket; const c=calc(p);
+  const champHit=state.champ&&b.champ===state.champ, thirdHit=state.third&&b.third===state.third;
+  setChampBanner(b.champ,b.third,champHit,thirdHit,CFG.campeon,CFG.tercero,c.fin);
+  playerBracketCols(p, wrap);
+}
+function playerBracketCols(p, wrap){
+  wrap.innerHTML=''; const b=p.bracket, c=calc(p); const L=liveRounds();
+  const realSets={r32:new Set(L.r32),r16:new Set(state.rounds.r16),qf:new Set(state.rounds.qf),sf:new Set(state.rounds.sf),final:new Set(state.rounds.final)};
+  const ptsR={r32:c.st.r32,r16:c.st.r16,qf:c.st.qf,sf:c.st.sf};
+  [['m_r32','r32','Dieciseisavos'],['m_r16','r16','Octavos'],['m_qf','qf','Cuartos'],['m_sf','sf','Semifinales']].forEach(([mk,rk,lab])=>{
+    const anyReal=realSets[rk].size>0; const ptsTxt=anyReal?` · <span style="color:var(--green)">+${ptsR[rk]}</span>`:'';
+    const ms=b[mk]||[]; let ties='';
+    if(ms.length) ms.forEach(fm=>ties+=tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win, anyReal?realSets[rk]:null));
+    else { for(let i=0;i<RN[rk];i++)ties+=placeholderTie(); }
+    wrap.appendChild(mkCol(lab,ties,ptsTxt));
+  });
+  const fm=(b.m_fin||[]).slice(-1)[0]; const anyF=realSets.final.size>0;
+  const ftie=fm?tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win,anyF?realSets.final:null):placeholderTie();
+  wrap.appendChild(mkCol('Final',ftie,anyF?` · <span style="color:var(--green)">+${c.st.fin}</span>`:''));
+}
+function placeholderTie(){ return `<div class="tie" style="opacity:.4"><div class="t"><span class="nm small">por definir</span></div><div class="t"><span class="nm small">por definir</span></div></div>`; }
+function singleTeamTie(t){ return `<div class="tie"><div class="t win"><span class="flag">${fl(t)}</span><span class="nm">${t}</span><span class="sc">✓</span></div></div>`; }
+function placeholderTie1(){ return `<div class="tie" style="opacity:.4"><div class="t"><span class="nm small">por definir</span></div></div>`; }
+
+/* ---------- detalle ---------- */
+function renderDetalleInit(){ const s=document.getElementById('playerSel'); s.innerHTML=DATA.players.map((p,i)=>`<option value="${i}">${p.name}</option>`).join(''); s.onchange=drawDetalle; }
+function drawDetalle(){
+  const idx=+document.getElementById('playerSel').value||0, p=DATA.players[idx], c=calc(p), b=p.bracket;
+  const stages=[['Grupos',c.grp],['R32',c.st.r32],['Octavos',c.st.r16],['Cuartos',c.st.qf],['Semis',c.st.sf],['Final',c.st.fin],['3er',c.st.third],['Sub',c.st.sub],['Campeón',c.st.camp]];
+  document.getElementById('stageBreak').innerHTML=stages.map(([l,v])=>`<div class="s"><div class="lab">${l}</div><div class="val" style="color:${v>0?'var(--green)':'var(--muted)'}">${v}</div></div>`).join('')+`<div class="s" style="background:#0a1018;color:#fff;border:none"><div class="lab" style="color:#9fb3ab">Total</div><div class="val">${c.total}</div></div>`;
+  const tb=document.getElementById('detBody'); tb.innerHTML='';
+  for(const m of DATA.matches){
+    const pred=p.scores[m.num]||[null,null], real=state.scores[m.num], r=matchPts(pred,real);
+    const tag=r.k==='exact'?'<span class="pill exact">5</span>':r.k==='sign'?'<span class="pill sign">3</span>':(real&&real[0]!=null&&real[0]!==''?'<span class="small">0</span>':'<span class="small">·</span>');
+    tb.insertAdjacentHTML('beforeend',`<tr><td class="num small">${m.num}</td><td class="num small">${m.grupo}</td>
+      <td class="right">${m.loc} ${fl(m.loc)}</td><td class="num predcell">${pred[0]!=null?pred[0]+'-'+pred[1]:'—'}</td>
+      <td class="num predcell">${real&&real[0]!=null&&real[0]!==''?real[0]+'-'+real[1]:'—'}</td><td>${fl(m.vis)} ${m.vis}</td><td class="num">${tag}</td></tr>`);
+  }
+  // posiciones de grupos según el pronóstico del jugador
+  document.getElementById('playerStandings').innerHTML=[...new Set(DATA.matches.map(m=>m.grupo))].map(g=>standingsCardHTML(g,p.scores,'pronosticados')).join('');
+  // fase de eliminación, gráfica como llaves con puntos por ronda
+  const champHit=state.champ&&b.champ===state.champ, thirdHit=state.third&&b.third===state.third;
+  document.getElementById('playerChampBanner').innerHTML=champBannerHTML(b.champ,b.third,champHit,thirdHit,CFG.campeon,CFG.tercero,c.fin);
+  playerBracketCols(p, document.getElementById('playerBracketGfx'));
+}
+function roundRow(lab,arr,realArr,pts){ const R=new Set(realArr); const any=R.size>0;
+  const chips=(arr||[]).map(t=>`<span class="chip ${any?(R.has(t)?'ok':'no'):''}"><span class="flag">${fl(t)}</span>${t}</span>`).join('')||'<span class="small">sin pronóstico</span>';
+  const badge=any?`<span class="pill ${pts>0?'exact':'sign'}" style="margin-left:6px">+${pts}</span>`:'';
+  return `<div style="margin:6px 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px"><span class="small" style="display:inline-block;min-width:104px;font-weight:700">${lab}${badge}</span> ${chips}</div>`; }
+function podOne(lab,pred,real,pts){ if(!pred)return`<span class="chip">${lab}: <span class="small">—</span></span>`;
+  const ok=real&&pred===real, cls=real?(ok?'ok':'no'):''; return `<span class="chip ${cls}"><span class="flag">${fl(pred)}</span>${lab}: ${pred}${ok?` <b>+${pts}</b>`:''}</span>`; }
+
+/* ---------- pronosticos matriz ---------- */
+function renderPred(){
+  let h='<thead><tr><th class="num">#</th><th>Partido</th>'+DATA.players.map(p=>`<th class="num">${p.name}</th>`).join('')+'</tr></thead><tbody>';
+  for(const m of DATA.matches){ h+=`<tr><td class="num small">${m.num}</td><td class="small">${fl(m.loc)} ${m.loc} <span style="color:var(--muted)">v</span> ${m.vis} ${fl(m.vis)}</td>`;
+    for(const p of DATA.players){ const s=p.scores[m.num]; h+=`<td class="num predcell">${s&&s[0]!=null?s[0]+'-'+s[1]:'—'}</td>`; } h+='</tr>'; }
+  document.getElementById('predTable').innerHTML=h+'</tbody>';
+  // fase final: todas las llaves de cada jugador
+  let f='<thead><tr><th>Etapa</th>'+DATA.players.map(p=>`<th>${p.name}</th>`).join('')+'</tr></thead><tbody>';
+  [['Dieciseisavos','r32'],['Octavos','r16'],['Cuartos','qf'],['Semifinales','sf'],['Finalistas','final']].forEach(([lab,key])=>{
+    f+=`<tr><td class="small" style="font-weight:700">${lab}</td>`;
+    for(const p of DATA.players){ const arr=[...new Set(p.bracket[key]||[])]; const cells=arr.length?arr.map(t=>`<span class="flag" title="${t}">${fl(t)}</span>`).join(' '):'<span class="small">—</span>'; f+=`<td style="line-height:1.9">${cells}</td>`; } f+='</tr>'; });
+  [['Campeón','champ'],['Subcampeón','sub'],['Tercer lugar','third']].forEach(([lab,key])=>{
+    f+=`<tr><td class="small" style="font-weight:700">${lab}</td>`;
+    for(const p of DATA.players){ const t=p.bracket[key]; f+=`<td class="small">${t?fl(t)+' '+t:'—'}</td>`; } f+='</tr>'; });
+  document.getElementById('predFinal').innerHTML=f+'</tbody>';
+}
+
+/* ---------- partidos del día ---------- */
+const MES={'enero':0,'febrero':1,'marzo':2,'abril':3,'mayo':4,'junio':5,'julio':6,'agosto':7,'septiembre':8,'octubre':9,'noviembre':10,'diciembre':11};
+function parseFecha(s){ const m=(s||'').toLowerCase().match(/(\d{1,2})\s+([a-záéíóú]+)/); if(!m)return null; const mes=MES[m[2]]; if(mes==null)return null; return new Date(2026,mes,+m[1]); }
+let dayDates=[], dayIdx=0;
+function initDays(){
+  const seen=[]; DATA.matches.forEach(m=>{ if(m.date&&!seen.includes(m.date))seen.push(m.date); });
+  dayDates=seen.filter(parseFecha).sort((a,b)=>parseFecha(a)-parseFecha(b));
+  const today=new Date(); today.setHours(0,0,0,0);
+  let idx=dayDates.findIndex(d=>{const pd=parseFecha(d);return pd&&pd.getTime()===today.getTime();});
+  if(idx<0) idx=dayDates.findIndex(d=>parseFecha(d)>=today);
+  if(idx<0) idx=0;
+  dayIdx=idx;
+}
+function renderDay(){
+  const date=dayDates[dayIdx]||'—'; document.getElementById('dLabel').textContent=date;
+  const ms=DATA.matches.filter(m=>m.date===date);
+  const wrap=document.getElementById('dayWrap');
+  if(!ms.length){ wrap.innerHTML='<p class="small">No hay partidos en esta fecha.</p>'; return; }
+  let h='<table class="day"><thead><tr><th>Partido</th><th class="num">Resultado</th>'+DATA.players.map(p=>`<th class="num">${p.name}</th>`).join('')+'</tr></thead><tbody>';
+  for(const m of ms){
+    const real=state.scores[m.num]; const has=real&&real[0]!=null&&real[0]!=='';
+    h+=`<tr><td><span class="gp" style="margin-right:6px">${m.grupo}</span>${fl(m.loc)} ${m.loc} <span class="small">vs</span> ${m.vis} ${fl(m.vis)}</td><td class="num"><b>${has?real[0]+'-'+real[1]:'—'}</b></td>`;
+    for(const p of DATA.players){ const pr=p.scores[m.num]; let cls='',ptsline='';
+      if(has&&pr&&pr[0]!=null){ const r=matchPts(pr,real); cls=r.k==='exact'?'dh-ex':r.k==='sign'?'dh-sg':'dh-no'; ptsline=`<div class="dpts">${r.p>0?'+'+r.p:'0'} pts</div>`; }
+      const predTxt=pr&&pr[0]!=null?pr[0]+'-'+pr[1]:'—';
+      h+=`<td class="num predcell ${cls}"><div>${predTxt}</div>${ptsline}</td>`; }
+    h+='</tr>';
+  }
+  wrap.innerHTML=h+'</tbody></table>';
+}
+document.getElementById('dPrev').onclick=()=>{ if(dayIdx>0){dayIdx--;renderDay();} };
+document.getElementById('dNext').onclick=()=>{ if(dayIdx<dayDates.length-1){dayIdx++;renderDay();} };
+document.getElementById('dToday').onclick=()=>{ initDays(); renderDay(); };
+
+/* ---------- sync ---------- */
+async function sync(){
+  const st=document.getElementById('syncStatus'); if(st)st.textContent='Sincronizando…';
+  try{
+    const res=await fetch(OPENFOOTBALL_URL+'?t='+Date.now(),{cache:'no-store'}); if(!res.ok)throw new Error('HTTP '+res.status);
+    const wc=await res.json(); let upd=0;
+    const koMap={'Round of 32':'r32','Round of 16':'r16','Quarter-final':'qf','Semi-final':'sf'};
+    const realKO={r32:[],r16:[],qf:[],sf:[],final:[]}; const sets={r32:new Set(),r16:new Set(),qf:new Set(),sf:new Set(),final:new Set()};
+    for(const fm of wc.matches){
+      const t1=ENG2TPL[fm.team1],t2=ENG2TPL[fm.team2];
+      const r=fm.round;
+      if(r&&r.startsWith('Matchday')){
+        if(!fm.score||!fm.score.ft||!t1||!t2)continue;
+        const m=MIDX[mkey(t1,t2)]; if(!m)continue; let gl,gv;
+        if(m.loc===t1){gl=fm.score.ft[0];gv=fm.score.ft[1];}else{gl=fm.score.ft[1];gv=fm.score.ft[0];}
+        const pv=state.scores[m.num]; if(!pv||+pv[0]!==+gl||+pv[1]!==+gv){state.scores[m.num]=[gl,gv];upd++;}
+      } else if(koMap[r]){
+        const rk=koMap[r]; let win=null,gl=null,gv=null;
+        if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1]; if(t1&&t2)win=gl>=gv?t1:t2;}
+        if(t1){sets[rk].add(t1);} if(t2){sets[rk].add(t2);}
+        realKO[rk].push({loc:t1,vis:t2,gl,gv,win});
+      } else if(r==='Final'){
+        let gl=null,gv=null,win=null; if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1];if(t1&&t2)win=gl>=gv?t1:t2;}
+        if(t1)sets.final.add(t1); if(t2)sets.final.add(t2); realKO.final.push({loc:t1,vis:t2,gl,gv,win});
+        if(win){state.champ=win; state.sub=(win===t1?t2:t1);}
+      } else if(r==='Match for third place'){
+        if(fm.score&&fm.score.ft&&t1&&t2){state.third=fm.score.ft[0]>=fm.score.ft[1]?t1:t2;}
+      }
+    }
+    ['r32','r16','qf','sf','final'].forEach(rk=>{ if(sets[rk].size) state.rounds[rk]=[...sets[rk]]; });
+    if(Object.values(realKO).some(a=>a.length)) state.realKO=realKO;
+    persist(); renderMatchInputs(); renderAdvance(); renderStandings(); renderRanking(); renderBracket();
+    const now=new Date(); if(st)st.textContent='✓ '+now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})+' · '+upd+' partido(s)';
+  }catch(e){ if(st)st.textContent='Error: '+e.message+(location.protocol==='file:'?' — súbelo a un hosting para evitar bloqueos.':''); }
+}
+let timer=null;
+function setAuto(on){ localStorage.setItem('pollaAuto',on?'1':'0'); const c=document.getElementById('autoChk'); if(c)c.checked=on; if(timer){clearInterval(timer);timer=null;} if(on){sync();timer=setInterval(sync,3e5);} }
+
+/* ---------- tabs / datos ---------- */
+function openTab(name){ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+  document.querySelectorAll('main section').forEach(s=>s.style.display='none'); document.getElementById('tab-'+name).style.display='';
+  if(name==='detalle')drawDetalle(); if(name==='pronos')renderPred(); if(name==='llaves')renderBracket(); if(name==='hoy')renderDay();
+  if(name==='ranking' && window.__leaderClub){ lastCeleb=window.__leaderName; window.__leaderClub==='BID'?fireworks():boo(); } }
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+function shareLink(){ const u=location.origin+location.pathname+'#r='+btoa(unescape(encodeURIComponent(JSON.stringify(state)))); document.getElementById('shareUrl').value=u; return u; }
+document.getElementById('btnShare').onclick=shareLink;
+document.getElementById('btnCopy').onclick=()=>{const u=shareLink();navigator.clipboard&&navigator.clipboard.writeText(u);};
+document.getElementById('btnExport').onclick=()=>document.getElementById('ioBox').value=JSON.stringify(state,null,2);
+document.getElementById('btnImport').onclick=()=>{try{state=JSON.parse(document.getElementById('ioBox').value);fixState();persist();renderAll();alert('Importado.');}catch(e){alert('JSON inválido');}};
+document.getElementById('btnReset').onclick=()=>{if(confirm('¿Borrar todos los resultados?')){state={scores:{},rounds:{r32:[],r16:[],qf:[],sf:[],final:[]},champ:'',sub:'',third:'',realKO:null};persist();location.hash='';renderAll();}};
+document.getElementById('btnSync').onclick=sync;
+document.getElementById('autoChk').onchange=e=>setAuto(e.target.checked);
+
+/* ---------- init ---------- */
+function renderAll(){ renderGrpFilter(); renderMatchInputs(); renderAdvance(); renderStandings(); renderBrkSel(); renderRanking(); renderDay(); }
+loadState(); renderDetalleInit(); initDays(); renderAll();
+setAuto(localStorage.getItem('pollaAuto')==='1');
+</script>
+</body>
+</html>
