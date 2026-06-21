@@ -520,6 +520,8 @@ function renderRanking(){
     document.getElementById('btnFinalToggle').onclick=()=>{ finalOn=!finalOn; localStorage.setItem('pollaFinalOn',finalOn?'1':'0'); renderRanking(); }; }
   const rows=DATA.players.map(p=>({name:p.name,...calc(p)}));
   rows.sort((a,b)=>b.total-a.total||clubRank(a.name)-clubRank(b.name)||b.grp-a.grp||a.name.localeCompare(b.name));
+  const fabLast=rows.length>1 && rows[rows.length-1].name==='Fabián';
+  if(fabLast) rows.reverse();  // si Fabián va último, se da vuelta el ranking y comienza desde el octavo
   const max=Math.max(1,...rows.map(r=>r.total));
   const tb=document.getElementById('rankBody'); tb.innerHTML='';
   rows.forEach((r,i)=>{
@@ -540,7 +542,7 @@ function renderRanking(){
    `<div class="k"><div class="v">${played()}<span style="font-size:13px;color:var(--muted)">/72</span></div><div class="l">Partidos jugados</div></div>
     <div class="k"><div class="v">${rows[0]?rows[0].total:0}</div><div class="l">Puntaje del líder</div></div>
     <div class="k"><div class="v">${avg}</div><div class="l">Promedio</div></div>
-    <div class="k"><div class="v">+${rows[0]?(rows[0].total-(rows[1]?rows[1].total:0)):0}</div><div class="l">Ventaja 1°-2°</div></div>`;
+    <div class="k"><div class="v">+${rows[0]?Math.abs(rows[0].total-(rows[1]?rows[1].total:0)):0}</div><div class="l">Ventaja 1°-2°</div></div>`;
   const labels=rows.map(r=>r.name);
   if(chTot)chTot.destroy();
   chTot=new Chart(document.getElementById('chTot'),{type:'bar',data:{labels,datasets:[{data:rows.map(r=>r.total),backgroundColor:'#16a34a',borderRadius:6}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f1f3'}},y:{grid:{display:false}}}}});
