@@ -480,13 +480,20 @@ let finalOn = localStorage.getItem('pollaFinalOn')!=='0';
 function groupsComplete(){ return played()===DATA.matches.length; }
 function countsFinal(){ return finalOn || groupsComplete(); }
 function provisionalR32(){
-  const out=[];
-  [...new Set(DATA.matches.map(m=>m.grupo))].forEach(g=>{ groupStandings(g).forEach((o,i)=>{ if(i<2&&o.pj>=1) out.push(o.t); }); });
+  const out=[], thirds=[];
+  [...new Set(DATA.matches.map(m=>m.grupo))].forEach(g=>{
+    const arr=groupStandings(g);
+    arr.forEach((o,i)=>{ if(i<2&&o.pj>=1) out.push(o.t); });
+    if(arr[2]&&arr[2].pj>=1) thirds.push(arr[2]);
+  });
+  thirds.sort((a,b)=>b.pts-a.pts||b.dg-a.dg||b.gf-a.gf||a.t.localeCompare(b.t));
+  thirds.slice(0,8).forEach(o=>out.push(o.t));
   return out;
 }
 function liveRounds(){
   const r=state.rounds;
-  return { r32:(r.r32&&r.r32.length)?r.r32:provisionalR32(), r16:r.r16, qf:r.qf, sf:r.sf, final:r.final };
+  const r32=[...new Set([...(r.r32||[]), ...provisionalR32()])];
+  return { r32, r16:r.r16, qf:r.qf, sf:r.sf, final:r.final };
 }
 function calc(p){
   let grp=0,exact=0,sign=0;
@@ -608,7 +615,7 @@ function renderMatchInputs(){
   cont.querySelectorAll('input').forEach(inp=>{ if(inp.value!=='')inp.classList.add('filled');
     inp.addEventListener('input',e=>{ const n=e.target.dataset.n,s=+e.target.dataset.s; if(!state.scores[n])state.scores[n]=['',''];
       state.scores[n][s]=e.target.value===''?'':+e.target.value; e.target.classList.toggle('filled',e.target.value!=='');
-      persist(); renderRanking(); renderStandings(); }); });
+      persist(); renderRanking(); renderStandings(); renderBracket(); }); });
 }
 
 /* ---------- tabla de posiciones ---------- */
@@ -689,12 +696,19 @@ function renderBracket(){
     setChampBanner(state.champ,state.third,false,false);
     const ko=state.realKO;
     [['r32','Dieciseisavos'],['r16','Octavos'],['qf','Cuartos'],['sf','Semifinales'],['final','Final']].forEach(([rk,lab])=>{
-      let ties='', ptsTxt=''; const cross=ko&&ko[rk]&&ko[rk].some(x=>x&&(x.loc||x.vis));
-      if(cross){
-        for(let i=0;i<RN[rk];i++){ const fm=ko[rk][i]; ties+= fm?tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win,null):placeholderTie(); }
+      let ties='', ptsTxt='';
+      const arr=ko&&ko[rk]?ko[rk]:[];
+      const played=arr.some(x=>x&&x.gl!=null&&x.gv!=null);
+      const named=arr.some(x=>x&&(x.loc||x.vis));
+      if(rk==='r32' && !played){
+        const fromKO=arr.flatMap(x=>[x&&x.loc,x&&x.vis]).filter(Boolean);
+        const tl=[...new Set([...(state.rounds.r32||[]), ...fromKO, ...provisionalR32()])];
+        for(let i=0;i<32;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
+        if(tl.length && !groupsComplete()) ptsTxt=' · <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">provisional</span>';
+      } else if(named){
+        for(let i=0;i<RN[rk];i++){ const fm=arr[i]; ties+= fm?tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win,null):placeholderTie(); }
       } else {
-        const exp={r32:32,r16:16,qf:8,sf:4,final:2}[rk]; let tl=state.rounds[rk]||[];
-        if(rk==='r32' && tl.length===0){ tl=provisionalR32(); if(tl.length) ptsTxt=' · <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">provisional</span>'; }
+        const exp={r32:32,r16:16,qf:8,sf:4,final:2}[rk]; const tl=state.rounds[rk]||[];
         for(let i=0;i<exp;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
       }
       wrap.appendChild(mkCol(lab,ties,ptsTxt));
