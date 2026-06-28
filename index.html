@@ -105,7 +105,8 @@
   /* matriz avance real */
   .adv td,.adv th{padding:6px 8px;text-align:center;border-bottom:1px solid #f1f3f6}
   .adv th{font-size:10px}
-  .adv .tname{text-align:left;display:flex;align-items:center;gap:7px;font-size:12.5px}
+  .adv .tname{text-align:left;white-space:nowrap;font-size:12.5px}
+  .adv .tname .flag{margin-right:7px}
   .adv input[type=checkbox]{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
 
   /* bracket */
@@ -649,10 +650,11 @@ function renderAdvance(){
   ['rCamp','rSub','rThird'].forEach((id,i)=>{ const el=document.getElementById(id); fillSel(el,[state.champ,state.sub,state.third][i]);
     el.onchange=e=>{ const v=e.target.value.replace(/^[^\sA-Za-zÁ]+ /,''); const t=teams.find(x=>e.target.value.endsWith(x))||''; if(id==='rCamp')state.champ=t; if(id==='rSub')state.sub=t; if(id==='rThird')state.third=t; persist(); renderRanking(); renderBracket(); }; });
   const tb=document.getElementById('advBody'); tb.innerHTML='';
+  const L=liveRounds();
   teams.forEach(t=>{
     const tr=document.createElement('tr');
     let cells=`<td class="tname"><span class="flag">${fl(t)}</span>${t}</td>`;
-    ['r32','r16','qf','sf','final'].forEach(rk=>{ const on=(state.rounds[rk]||[]).includes(t); cells+=`<td><input type="checkbox" data-r="${rk}" data-t="${t}" ${on?'checked':''}></td>`; });
+    ['r32','r16','qf','sf','final'].forEach(rk=>{ const src=rk==='r32'?L.r32:(state.rounds[rk]||[]); const on=src.includes(t); cells+=`<td><input type="checkbox" data-r="${rk}" data-t="${t}" ${on?'checked':''}></td>`; });
     tr.innerHTML=cells; tb.appendChild(tr);
   });
   tb.querySelectorAll('input').forEach(c=>c.addEventListener('change',e=>{
@@ -698,11 +700,10 @@ function renderBracket(){
     [['r32','Dieciseisavos'],['r16','Octavos'],['qf','Cuartos'],['sf','Semifinales'],['final','Final']].forEach(([rk,lab])=>{
       let ties='', ptsTxt='';
       const arr=ko&&ko[rk]?ko[rk]:[];
-      const played=arr.some(x=>x&&x.gl!=null&&x.gv!=null);
       const named=arr.some(x=>x&&(x.loc||x.vis));
+      const played=arr.some(x=>x&&x.gl!=null&&x.gv!=null);
       if(rk==='r32' && !played){
-        const fromKO=arr.flatMap(x=>[x&&x.loc,x&&x.vis]).filter(Boolean);
-        const tl=[...new Set([...(state.rounds.r32||[]), ...fromKO, ...provisionalR32()])];
+        const tl=liveRounds().r32;
         for(let i=0;i<32;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
         if(tl.length && !groupsComplete()) ptsTxt=' · <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">provisional</span>';
       } else if(named){
@@ -874,7 +875,7 @@ document.getElementById('autoChk').onchange=e=>setAuto(e.target.checked);
 /* ---------- init ---------- */
 function renderAll(){ renderGrpFilter(); renderMatchInputs(); renderAdvance(); renderStandings(); renderBrkSel(); renderRanking(); renderDay(); }
 loadState(); renderDetalleInit(); initDays(); renderAll();
-setAuto(localStorage.getItem('pollaAuto')==='1');
+setAuto(localStorage.getItem('pollaAuto')!=='0');
 </script>
 </body>
 </html>
