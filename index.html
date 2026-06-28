@@ -491,10 +491,18 @@ function provisionalR32(){
   thirds.slice(0,8).forEach(o=>out.push(o.t));
   return out;
 }
+function winnersOf(rk){
+  const a=(state.realKO&&state.realKO[rk])?state.realKO[rk]:[];
+  return a.map(x=>x&&x.win).filter(Boolean);
+}
 function liveRounds(){
   const r=state.rounds;
   const r32=[...new Set([...(r.r32||[]), ...provisionalR32()])];
-  return { r32, r16:r.r16, qf:r.qf, sf:r.sf, final:r.final };
+  const r16=[...new Set([...(r.r16||[]), ...winnersOf('r32')])];
+  const qf =[...new Set([...(r.qf ||[]), ...winnersOf('r16')])];
+  const sf =[...new Set([...(r.sf ||[]), ...winnersOf('qf')])];
+  const final=[...new Set([...(r.final||[]), ...winnersOf('sf')])];
+  return { r32, r16, qf, sf, final };
 }
 function calc(p){
   let grp=0,exact=0,sign=0;
@@ -654,7 +662,7 @@ function renderAdvance(){
   teams.forEach(t=>{
     const tr=document.createElement('tr');
     let cells=`<td class="tname"><span class="flag">${fl(t)}</span>${t}</td>`;
-    ['r32','r16','qf','sf','final'].forEach(rk=>{ const src=rk==='r32'?L.r32:(state.rounds[rk]||[]); const on=src.includes(t); cells+=`<td><input type="checkbox" data-r="${rk}" data-t="${t}" ${on?'checked':''}></td>`; });
+    ['r32','r16','qf','sf','final'].forEach(rk=>{ const on=(L[rk]||[]).includes(t); cells+=`<td><input type="checkbox" data-r="${rk}" data-t="${t}" ${on?'checked':''}></td>`; });
     tr.innerHTML=cells; tb.appendChild(tr);
   });
   tb.querySelectorAll('input').forEach(c=>c.addEventListener('change',e=>{
@@ -696,20 +704,20 @@ function renderBracket(){
   const wrap=document.getElementById('bracketWrap'); wrap.innerHTML='';
   if(brkView==='REAL'){
     setChampBanner(state.champ,state.third,false,false);
-    const ko=state.realKO;
+    const ko=state.realKO, L=liveRounds();
     [['r32','Dieciseisavos'],['r16','Octavos'],['qf','Cuartos'],['sf','Semifinales'],['final','Final']].forEach(([rk,lab])=>{
       let ties='', ptsTxt='';
       const arr=ko&&ko[rk]?ko[rk]:[];
       const named=arr.some(x=>x&&(x.loc||x.vis));
       const played=arr.some(x=>x&&x.gl!=null&&x.gv!=null);
       if(rk==='r32' && !played){
-        const tl=liveRounds().r32;
+        const tl=L.r32;
         for(let i=0;i<32;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
         if(tl.length && !groupsComplete()) ptsTxt=' · <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">provisional</span>';
       } else if(named){
         for(let i=0;i<RN[rk];i++){ const fm=arr[i]; ties+= fm?tieHTML(fm.loc,fm.vis,fm.gl,fm.gv,fm.win,null):placeholderTie(); }
       } else {
-        const exp={r32:32,r16:16,qf:8,sf:4,final:2}[rk]; const tl=state.rounds[rk]||[];
+        const exp={r32:32,r16:16,qf:8,sf:4,final:2}[rk]; const tl=L[rk]||[];
         for(let i=0;i<exp;i++){ ties+= tl[i]?singleTeamTie(tl[i]):placeholderTie1(); }
       }
       wrap.appendChild(mkCol(lab,ties,ptsTxt));
