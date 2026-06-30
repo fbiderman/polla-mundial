@@ -828,6 +828,11 @@ document.getElementById('dNext').onclick=()=>{ if(dayIdx<dayDates.length-1){dayI
 document.getElementById('dToday').onclick=()=>{ initDays(); renderDay(); };
 
 /* ---------- sync ---------- */
+function koWinner(sc,t1,t2){
+  if(!sc||!t1||!t2)return null;
+  const by=a=>(a&&a.length===2&&a[0]!==a[1])?(a[0]>a[1]?t1:t2):null;
+  return by(sc.p)||by(sc.et)||by(sc.ft)||null;
+}
 async function sync(){
   const st=document.getElementById('syncStatus'); if(st)st.textContent='Sincronizando…';
   try{
@@ -845,15 +850,15 @@ async function sync(){
         const pv=state.scores[m.num]; if(!pv||+pv[0]!==+gl||+pv[1]!==+gv){state.scores[m.num]=[gl,gv];upd++;}
       } else if(koMap[r]){
         const rk=koMap[r]; let win=null,gl=null,gv=null;
-        if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1]; if(t1&&t2)win=gl>=gv?t1:t2;}
+        if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1];} win=koWinner(fm.score,t1,t2);
         if(t1){sets[rk].add(t1);} if(t2){sets[rk].add(t2);}
         realKO[rk].push({loc:t1,vis:t2,gl,gv,win});
       } else if(r==='Final'){
-        let gl=null,gv=null,win=null; if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1];if(t1&&t2)win=gl>=gv?t1:t2;}
+        let gl=null,gv=null,win=koWinner(fm.score,t1,t2); if(fm.score&&fm.score.ft){gl=fm.score.ft[0];gv=fm.score.ft[1];}
         if(t1)sets.final.add(t1); if(t2)sets.final.add(t2); realKO.final.push({loc:t1,vis:t2,gl,gv,win});
         if(win){state.champ=win; state.sub=(win===t1?t2:t1);}
       } else if(r==='Match for third place'){
-        if(fm.score&&fm.score.ft&&t1&&t2){state.third=fm.score.ft[0]>=fm.score.ft[1]?t1:t2;}
+        const w=koWinner(fm.score,t1,t2); if(w)state.third=w;
       }
     }
     ['r32','r16','qf','sf','final'].forEach(rk=>{ if(sets[rk].size) state.rounds[rk]=[...sets[rk]]; });
