@@ -202,6 +202,17 @@
   .navhint .nh{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fbfcfe}
   .navhint .nh b{display:block;margin-bottom:2px}
 
+  /* fuera de competencia */
+  .fuera{margin-bottom:16px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#0a1018,#16324a);box-shadow:var(--shadow2)}
+  .fuera-badge{background:rgba(255,255,255,.08);color:#ffd76a;font-family:'Outfit';font-weight:800;font-size:11px;letter-spacing:2px;text-align:center;padding:6px}
+  .fuera-row{display:flex;align-items:center;gap:14px;padding:14px 18px}
+  .fuera .fflag{font-size:34px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+  .fuera-txt{flex:1;min-width:0}
+  .fuera-name{font-family:'Outfit';font-weight:800;font-size:19px;color:#fff}
+  .fuera-sub{font-size:12px;color:#b9c7d6;margin-top:2px;line-height:1.35}
+  .fuera-pts{font-family:'Outfit';font-weight:800;font-size:26px;color:#ffd76a;text-align:center;line-height:1}
+  .fuera-pts span{display:block;font-size:10px;font-weight:600;color:#8ea3b6;letter-spacing:1px;margin-top:3px}
+
   /* tabla de posiciones */
   .standings{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
   .gcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:var(--shadow2)}
@@ -271,6 +282,7 @@
       <h2>Tabla general</h2>
       <p class="desc">Toca a un jugador para ver su detalle. Exacto <span class="pill exact">5</span> · signo <span class="pill sign">3</span> · más puntos por acertar quién avanza en cada llave.</p>
       <div id="finalToggleWrap" style="margin-bottom:14px"></div>
+      <div id="fueraComp" style="display:none"></div>
       <table><thead><tr><th class="pos">#</th><th>Jugador</th><th class="num">Total</th><th class="num">Grupos</th><th class="num">Final</th><th style="width:150px">Avance</th></tr></thead>
       <tbody id="rankBody"></tbody></table>
     </div>
@@ -536,8 +548,14 @@ function renderRanking(){
     document.getElementById('btnFinalToggle').onclick=()=>{ finalOn=!finalOn; localStorage.setItem('pollaFinalOn',finalOn?'1':'0'); renderRanking(); }; }
   const rows=DATA.players.map(p=>({name:p.name,...calc(p)}));
   rows.sort((a,b)=>b.total-a.total||clubRank(a.name)-clubRank(b.name)||b.grp-a.grp||a.name.localeCompare(b.name));
+  // easter egg: si Fabián va último, sale de competencia (demasiado bueno) y se muestra aparte
   const fabLast=rows.length>1 && rows[rows.length-1].name==='Fabián';
-  if(fabLast) rows.reverse();  // si Fabián va último, se da vuelta el ranking y comienza desde el octavo
+  const fuera=document.getElementById('fueraComp');
+  let fabRow=null; if(fabLast) fabRow=rows.pop();
+  if(fuera){
+    if(fabRow){ fuera.style.display=''; fuera.innerHTML=`<div class="fuera"><div class="fuera-badge">★ Fuera de competencia ★</div><div class="fuera-row"><span class="fflag">🏆</span><div class="fuera-txt"><div class="fuera-name">Fabián</div><div class="fuera-sub">Demasiado bueno para competir —y además guapo, simpático y creativo—. Se retira voluntariamente para que el resto tenga una oportunidad.</div></div><div class="fuera-pts">${fabRow.total}<span>pts</span></div></div></div>`; }
+    else { fuera.style.display='none'; fuera.innerHTML=''; }
+  }
   const max=Math.max(1,...rows.map(r=>r.total));
   const tb=document.getElementById('rankBody'); tb.innerHTML='';
   rows.forEach((r,i)=>{
